@@ -8,3 +8,4 @@
 7. App that gives the most inconvenient ways to get to a certain location (i.e. swimming across an ocean).
 8. Simulate some toy/game inside the Google Maps API.
 9. Create a virus outbreak game inside the Google Maps API, where you create your own virus and see how it spreads to other unsuspecting people. 
+10. Warring Kingdoms - Each country or state has its own sprite, where they battle it out.
