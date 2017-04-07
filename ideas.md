@@ -1,1 +1,1 @@
-1. Learning app with puzzles
+1. Learning geography with puzzles
