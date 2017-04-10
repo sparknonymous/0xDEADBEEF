@@ -6,6 +6,7 @@
 ![Alt text](https://i.imgur.com/e6GGGLr.png "Board1")
 
 ## Arvin Dagoc (Sparknonymous)Storyboards:
+*Finding events on Campus*
 ![Events](Images/storyboard%20events%20app.jpg)
 
 ## Storyboard 3:
