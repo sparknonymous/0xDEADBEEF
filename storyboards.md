@@ -19,5 +19,9 @@
 *See travel times and traffic for nearby restaurants of a chosen category.*
 ![Food Traffic](Images/food%20traffic%20storyboard.jpg)
 
+## Phillip Zhou (phzhou76) Storyboards:
+*Representing the places nearby in 3D shapes based on how crowded they are at the current time.*
+![3D Population Cluster](Images/COGS%20121%20Storyboard%201.png)
 
-## Storyboard 4:
+*Game that involves each country in a free-for-all war with each other.*
+![Warring Kingdoms](Images/COGS%20121%20Storyboard%202.png)
