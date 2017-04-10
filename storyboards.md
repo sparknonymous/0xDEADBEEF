@@ -11,7 +11,10 @@
 
 ## Ricky Lieu (Rickylieu) Storyboards:
 *Find out in the surrounding region which specific areas get more or less Tinder swipes.*
-![Events](Images/tinder%20storyboard.jpg)
+![Tinder](Images/tinder%20storyboard.jpg)
+
+*See travel times and traffic for nearby restaurants of a chosen category.*
+![Food Traffic](Images/food%20traffic%20storyboard.jpg)
 
 
 ## Storyboard 4:
