@@ -9,6 +9,9 @@
 *Finding events on Campus*
 ![Events](Images/storyboard%20events%20app.jpg)
 
+*App that shows the places/areas you've been*
+![Explore](Images/storyboard%20explore.jpg)
+
 ## Ricky Lieu (Rickylieu) Storyboards:
 *Find out in the surrounding region which specific areas get more or less Tinder swipes.*
 ![Tinder](Images/tinder%20storyboard.jpg)
