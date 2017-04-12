@@ -1,11 +1,11 @@
-##Project Title
+## Project Title
 
-##Summary (140 word)
+## Summary (140 words)
 
-##Storyboard
+## Storyboard
 
-##Feedback Taken
+## Feedback Taken
 
-##Features
+## Features
 
-##How to split tasks
+## How to split tasks
