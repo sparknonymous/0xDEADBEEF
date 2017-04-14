@@ -6,7 +6,7 @@ Communicate with other users in your nearby region! Experience what they're
 experiencing; experience Déjà Moo.
 
 ## Storyboard
-![Déjà Moo] (Images/COGS%20121%20Storyboard%202%20Redux.png)
+![Déjà Moo] (Images/COGS121Storyboard2Redux.png)
 
 ## Feedback Taken
 This web app includes aspects of the events idea. We took the feedback stating that an app like that would be useless since people could find events on Facebook. So this app takes it one step further than Facebook in that a pin could be placed on an event saying whether or not it's a good event, whether it's worth going.
