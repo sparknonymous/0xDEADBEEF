@@ -12,3 +12,7 @@ This web app includes aspects of the events idea. We took the feedback stating t
 ## Features
 
 ## How to split tasks
+Arvin: Frontend & UI
+Phillip: Maps API & Backend
+Siyu: UI Support/Text Support & Backend
+Ricky: Database
