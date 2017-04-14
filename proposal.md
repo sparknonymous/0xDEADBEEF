@@ -6,6 +6,7 @@ Communicate with other users in your nearby region! Experience what they're
 experiencing; experience Déjà Moo.
 
 ## Storyboard
+*Scenario where Déjà Moo can be used.*
 ![Déjà Moo] (Images/Proposal%20Storyboard.jpg)
 
 ## Feedback Taken
