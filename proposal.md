@@ -1,7 +1,9 @@
 ## Project Title
 Déjà Moo
 
-## Summary (140 words)
+## Summary
+Communicate with other users in your nearby region! Experience what they're
+experiencing; experience Déjà Moo.
 
 ## Storyboard
 
