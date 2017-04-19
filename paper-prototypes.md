@@ -8,3 +8,6 @@
 
 ## Ricky Lieu
 ![Prototype](Images/Ricky's%20Paper%20Prototype.jpg)
+
+## Arvin Dagoc
+![Prototype](Images/IMG_6615.JPG) 
