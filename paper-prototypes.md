@@ -1,5 +1,7 @@
 ## Siyu Yang
+The first picture shows the interaction where you can drop a cow, dragging the cow around will allow you to move the cow within a fixed distance, clicking the cow will allow you to add notes, and clicking ok will drop the cow .
 ![Prototype](Images/Steven's%20Paper%20Prototype%20Part%20A.jpg)
+The second picture shows the interaction where the user can see the whole map and all the cows that have been dropped.
 ![Prototype](Images/Steven's%20Paper%20Prototype%20Part%20B.jpg)
 
 ## Phillip Zhou
