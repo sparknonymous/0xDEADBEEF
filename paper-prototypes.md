@@ -14,4 +14,5 @@ This prototype shows the user interacting with the app's discovery feature.  By 
 ![Prototype](Images/Ricky's%20Paper%20Prototype.jpg)
 
 ## Arvin Dagoc
+This prototype shows the top pins functionality. Clicking on this tab shows the most popular pins, in terms of how many uproots it has. This also shows that by clicking on one of the pins, it shows the actual comment of the pin and lets you up vote or down vote the pin.
 ![Prototype](Images/IMG_6615.JPG) 
