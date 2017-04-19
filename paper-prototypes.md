@@ -5,6 +5,7 @@ The second picture shows the interaction where the user can see the whole map an
 ![Prototype](Images/Steven's%20Paper%20Prototype%20Part%20B.jpg)
 
 ## Phillip Zhou
+The prototype shows the user's interaction with adding a comment to the map.
 ![Prototype](Images/COGS%20121%20Paper%20Prototype%20Step%201.png)
 ![Prototype](Images/COGS%20121%20Paper%20Prototype%20Step%202.png)
 
