@@ -1,0 +1,23 @@
+{
+  "name": "ixd-workshop-lost-and-found",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node node_modules/keeling-js/entry.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DesignAtLarge/ixd-workshop-lost-and-found.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DesignAtLarge/ixd-workshop-lost-and-found/issues"
+  },
+  "homepage": "https://github.com/DesignAtLarge/ixd-workshop-lost-and-found#readme",
+  "dependencies": {
+    "keeling-js": "^1.1.1"
+  }
+}
