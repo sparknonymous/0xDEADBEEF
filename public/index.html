@@ -58,7 +58,15 @@
 
                 //call adding cow pin function
                 google.maps.event.addListener(map, 'click', function(event) {
-                    addCowPin(event.latLng, map, writing);
+                    var txt;
+                    var promp = prompt("Please enter description:", "Moooo");
+                    if (promp == null || promp == "") {
+                        txt = "";
+                    } 
+                    else {
+                        txt = promp;
+                        addCowPin(event.latLng, map, txt);
+                    }
                  });
 
 
@@ -79,7 +87,7 @@
                 url:'https://d30y9cdsu7xlg0.cloudfront.net/png/10680-200.png',
                 size:new google.maps.Size(40, 40),
                 scaledSize:new google.maps.Size(40, 40),
-                labelOrigin:new google.maps.Point(25,50),
+                labelOrigin:new google.maps.Point(20,50),
              };
 
             var marker = new google.maps.Marker({ 
@@ -110,10 +118,10 @@
         function postFound() {
             var name, description;
             if ((name = $("#found-item").val()) == "") {
-                alert("Please insert the name of the item");
+                alert("Please insert the name of the cow");
             }
             if ((description = $("#found-description").val()) == "") {
-                alert("Please insert the description of the item");
+                alert("Please insert the description");
             }
             randomClosePosition(function (pos) {
                 // TODO: Post the information   
@@ -134,8 +142,8 @@
 
         function randomClosePosition(callback) {
             getGeoPosition(function (pos) {
-                pos.lat += -0.01 + Math.random() * 0.02;
-                pos.lng += -0.01 + Math.random() * 0.02;
+                // pos.lat += -0.01 + Math.random() * 0.02;
+                // pos.lng += -0.01 + Math.random() * 0.02;
                 callback(pos);
             });
         }
