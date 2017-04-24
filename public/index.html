@@ -53,8 +53,9 @@
                     icon: "img/self.png",
                     map: map
                 });
-                loadLost();
+                //loadLost();
 
+                
 
                 //call adding cow pin function
                 google.maps.event.addListener(map, 'click', function(event) {
@@ -68,13 +69,8 @@
                         addCowPin(event.latLng, map, txt);
                     }
                  });
-
-
-
             });
         }
-
-        
         
         
              
