@@ -1,6 +1,6 @@
 {
     "debug": true,
-    "name": "Keeling Js Default",
+    "name": "Deja Moo",
     "port": 21023,
     "session_secret": "keeling-session",
     "default_page": "index",

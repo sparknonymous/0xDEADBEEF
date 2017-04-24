@@ -1,11 +1,8 @@
-// Will be used to communicate between client and server.
-
-/* This is an array of one item. */
 [
-  {
-    "name": "Umbrella",
-    "description": "None",
-    "lat": 32.8819696,
-    "lng": -117.2398678
-  }
+    {
+        "name": "Umbrella",
+        "description": "None",
+        "lat": 32.8819696,
+        "lng": -117.2398678
+    }
 ]

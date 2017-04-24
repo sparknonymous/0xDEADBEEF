@@ -1,20 +1,17 @@
 <!--
-DesignAtLarge/ixd-workshop-lost-and-found
-@Author: Ziyang Li
-@Website: https://liby.me
-@Date: Apr.18 2017
+@Author: 0xDEADBEEF
 -->
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lost and Found</title>
+    <title>Deja Moo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <link rel="stylesheet" href="css/index.css" />
     <script src="js/jquery.js"></script>
 </head>
 <body>
-    <nav>Lost and Found</nav>
+    <nav>Deja Moo</nav>
     <main>
         <tab-section id="lost-tab-section" class="active">
             <div id="map-outer">
@@ -24,28 +21,25 @@ DesignAtLarge/ixd-workshop-lost-and-found
         </tab-section>
         <tab-section id="found-tab-section">
             <form id="found-form">
-                <h2>Post your Found</h2>
-                <label>Item: </label>
-                <input id="found-item" type="text" placeholder="Umbrella..." />
+                <h2>Drop a Cow</h2>
+                <label>Cow name: </label>
+                <input id="found-item" type="text" placeholder="Moo..." />
                 <label>Description: </label>
-                <textarea id="found-description" placeholder="Transparent White..."></textarea>
-                <button type="submit">Post</button>
+                <textarea id="found-description" placeholder="Free Cookies..."></textarea>
+                <button type="submit">Drop</button>
             </form>
         </tab-section>
     </main>
     <footer>
-        <tab id="lost-tab" class="active">Lost</tab>
-        <tab id="found-tab">Found</tab>
+        <tab id="lost-tab" class="active">Show all cows</tab>
+        <tab id="found-tab">Drop a cow</tab>
     </footer>
     <script>
         var map;
-
         //wizard of oz comment
         var writing = {
-         text:'User comment example: this is lit',
+         text:'User comment: This is lit!',
         };
-
-
 
         function initMap() {
             $("#map-loading").fadeOut();
@@ -82,19 +76,17 @@ DesignAtLarge/ixd-workshop-lost-and-found
 
             //icon of the pin
             var picture ={
-                 url:'https://s-media-cache-ak0.pinimg.com/736x/56/44/8f/56448f7db172d0d286df91b48c6f48b2.jpg',
+                url:'https://d30y9cdsu7xlg0.cloudfront.net/png/10680-200.png',
                 size:new google.maps.Size(40, 40),
                 scaledSize:new google.maps.Size(40, 40),
                 labelOrigin:new google.maps.Point(25,50),
              };
-            
 
             var marker = new google.maps.Marker({ 
                 position: location, 
                 map: map,
                 label:writing,
                 icon:picture,
-    
             });
         }
 
