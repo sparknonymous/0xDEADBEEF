@@ -40,6 +40,13 @@ DesignAtLarge/ixd-workshop-lost-and-found
     <script>
         var map;
 
+        //wizard of oz comment
+        var writing = {
+         text:'User comment example: this is lit',
+        };
+
+
+
         function initMap() {
             $("#map-loading").fadeOut();
             getGeoPosition(function (pos) {
@@ -53,8 +60,44 @@ DesignAtLarge/ixd-workshop-lost-and-found
                     map: map
                 });
                 loadLost();
+
+
+                //call adding cow pin function
+                google.maps.event.addListener(map, 'click', function(event) {
+                    addCowPin(event.latLng, map, writing);
+                 });
+
+
+
             });
         }
+
+        
+        
+        
+             
+
+        //adds new cow pin
+        function addCowPin(location, map, writing ) {
+
+            //icon of the pin
+            var picture ={
+                 url:'https://s-media-cache-ak0.pinimg.com/736x/56/44/8f/56448f7db172d0d286df91b48c6f48b2.jpg',
+                size:new google.maps.Size(40, 40),
+                scaledSize:new google.maps.Size(40, 40),
+                labelOrigin:new google.maps.Point(25,50),
+             };
+            
+
+            var marker = new google.maps.Marker({ 
+                position: location, 
+                map: map,
+                label:writing,
+                icon:picture,
+    
+            });
+        }
+
 
         function loadLost() {
             // TODO: Load the lost panel
@@ -81,7 +124,7 @@ DesignAtLarge/ixd-workshop-lost-and-found
                 alert("Please insert the description of the item");
             }
             randomClosePosition(function (pos) {
-                // TODO: Post the information
+                // TODO: Post the information   
             });
         }
 
