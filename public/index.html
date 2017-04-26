@@ -18,145 +18,15 @@
     <nav>Deja Moo</nav>
     <main>
         <!-- Loading screen and Google Maps are held here. -->
-        <tab-section class="active">
-            <div id="map-outer">
-                <img id="map-loading" src="img/loading.svg" />
-                <div id="map"></div>
-            </div>
-        </tab-section>
-        <tab-section id="found-tab-section">
-            <form id="found-form">
-                <h2>Drop a Cow</h2>
-                <label>Cow name: </label>
-                <input id="found-item" type="text" placeholder="Moo..." />
-                <label>Description: </label>
-                <textarea id="found-description" placeholder="Free Cookies...">
-                  </textarea>
-                <button type="submit">Drop</button>
-            </form>
-        </tab-section>
+        <div id="map-outer">
+            <img id="map-loading" src="img/loading.svg" />
+            <div id="map"></div>
+        </div>
+        <a id="drop-cow">Drop a Cow!</a>
     </main>
     <footer>
-        <tab id="lost-tab" class="active">Show all cows</tab>
-        <tab id="found-tab">Drop a cow</tab>
+        <tab>Moo!</tab>
     </footer>
-    <script>
-    /*
-        var map;
-        //wizard of oz comment
-        var writing = {
-            text: 'User comment: This is lit!',
-        };
-
-        function initMap() {
-            $("#map-loading").fadeOut();
-            getGeoPosition(function(pos) {
-                map = new google.maps.Map(document.getElementById("map"), {
-                    zoom: 15,
-                    center: pos
-                });
-                var marker = new google.maps.Marker({
-                    position: pos,
-                    icon: "img/self.png",
-                    map: map
-                });
-                //loadLost();
-
-
-
-                //call adding cow pin function
-                google.maps.event.addListener(map, 'click', function(event) {
-                    var txt;
-                    var promp = prompt("Please enter description:", "Moooo");
-                    if (promp == null || promp == "") {
-                        txt = "";
-                    } else {
-                        txt = promp;
-                        addCowPin(event.latLng, map, txt);
-                    }
-                });
-            });
-        }
-
-
-
-
-        //adds new cow pin
-        function addCowPin(location, map, writing) {
-
-            //icon of the pin
-            var picture = {
-                url: 'https://d30y9cdsu7xlg0.cloudfront.net/png/10680-200.png',
-                size: new google.maps.Size(40, 40),
-                scaledSize: new google.maps.Size(40, 40),
-                labelOrigin: new google.maps.Point(20, 50),
-            };
-
-            var marker = new google.maps.Marker({
-                position: location,
-                map: map,
-                label: writing,
-                icon: picture,
-            });
-        }
-
-
-        function loadLost() {
-            // TODO: Load the lost panel
-            ajax({
-                url: "/ajax/lost?action=get",
-                type: "get",
-                success: function(data) {
-                    data.forEach(function(lost) {
-                        var item = new google.maps.InfoWindow; // This code creates an item for the map, in the form of a pin.
-                        item.setPosition({
-                            lat: lost.lat,
-                            lng: lost.lng
-                        });
-                        item.setContent(lost.name);
-                        item.open(map); // Places the item onto the map.
-                    });
-                }
-            });
-        }
-
-        function postFound() {
-            var name, description;
-            if ((name = $("#found-item").val()) == "") {
-                alert("Please insert the name of the cow");
-            }
-            if ((description = $("#found-description").val()) == "") {
-                alert("Please insert the description");
-            }
-            randomClosePosition(function(pos) {
-                // TODO: Post the information
-            });
-        }
-
-        function getGeoPosition(callback) {
-            // TODO: Try to get geolocation and put the result back to
-            // callback in the form of
-            //  {
-            //      lat: <LATITUDE>,
-            //      lng: <LONGITUDE>
-            //  }
-            navigator.geolocation.getCurrentPosition(function(info) {
-                callback({
-                    lat: info.coords.latitude,
-                    lng: info.coords.longitude
-                })
-            });
-        }
-
-        function randomClosePosition(callback) {
-            getGeoPosition(function(pos) {
-                // pos.lat += -0.01 + Math.random() * 0.02;
-                // pos.lng += -0.01 + Math.random() * 0.02;
-                callback(pos);
-            });
-        }
-        */
-    </script>
     <script src="js/index.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9oo55BbM0hkN5HBMwpCflHN0Ed0p_w8A&callback=initMap"></script>
 </body>
