@@ -7,6 +7,8 @@ Implemented the cow pin marker functionality
 Implemented the comment system for the cow pins
 
 ## Phillip
+Integrated cow pin marker functionality and the comment system. Implemented
+cow pin toggle functionality.
 
 ## Arvin
 
