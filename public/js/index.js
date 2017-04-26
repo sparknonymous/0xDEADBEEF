@@ -118,6 +118,7 @@ function mapClick(location) {
 
 var last_saved;
 var last_marker;
+var content = "";
 
 function addCowPin(location, map, text) {
     var picture = {
@@ -131,21 +132,30 @@ function addCowPin(location, map, text) {
         position: location,
         map: map,
         label: text,
-        icon: picture
+        icon: picture,
+        text: content
     });
+
+    last_marker = marker;
 
     marker.addListener('click', function(event) {
         var infoWindow = new google.maps.InfoWindow({
-            content: '</br>' + '<button onclick="addComment()">New Comment</button>',
+            content: marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>',
             height: '100px'
         });
-        infoWindow.open(map, marker);
         last_saved = infoWindow;
         last_marker = marker;
+        infoWindow.open(map, marker);
+
+
     });
 }
 
 function addComment() {
     promp = prompt("Add a comment", "");
-    last_saved.setContent('<div><p>' + promp + '</p></div>' + '</br>');
+    last_marker.text += '<div><p>' + promp + '</p></div>';
+    //last_saved.setContent(last_marker.text + '</br>' + '<button onclick="addComment()">New Comment</button>')
+    last_saved.close()
+    //last_saved.setContent('<div><p>' + promp + '</p></div>' + '</br>' + last_saved.content);
+    console.log(last_saved.content)
 }
