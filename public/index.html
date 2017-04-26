@@ -9,6 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <link rel="stylesheet" href="css/index.css" />
     <script src="js/jquery.js"></script>
+    <script src="js/cow.js"></script>
+
 </head>
 <body>
     <nav>Deja Moo</nav>
@@ -36,6 +38,7 @@
     </footer>
     <script>
         var map;
+        var global_marker;
         //wizard of oz comment
         var writing = {
          text:'User comment: This is lit!',
@@ -73,8 +76,6 @@
         }
         
         
-             
-
         //adds new cow pin
         function addCowPin(location, map, writing ) {
 
@@ -85,13 +86,40 @@
                 scaledSize:new google.maps.Size(40, 40),
                 labelOrigin:new google.maps.Point(20,50),
              };
-
+            var test = [];
+            var comments = "";
+            test.push("Pizza");
+            test.push("This place is great")
             var marker = new google.maps.Marker({ 
                 position: location, 
                 map: map,
                 label:writing,
                 icon:picture,
+                text: comments,
             });
+            global_marker = marker;
+
+            console.log(marker['text'])
+
+            //Add infowindow
+            marker.addListener('click', function(event) {
+               global_marker = marker;
+               var infowindow = new google.maps.InfoWindow({
+               content: marker['text'] + '</br>' + '<button onclick="addComment()">New Comment</button>'
+               });
+               //infowindow.setContent('<button onclick="addComment()">New Comment</button>');
+               infowindow.open(map,marker);
+
+            });
+        }
+        function addComment() {
+          promp = prompt("Add a comment", "")
+          global_marker['text'] += promp + '</br>'
+          console.log(global_marker.text)
+        }
+
+        function cowClick() {
+            console.log("yay")
         }
 
 
