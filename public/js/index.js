@@ -119,15 +119,24 @@ function eventColor() {
         console.log(color)
   });
 }
+
+
 function mapClick(location) {
     if (dropMode) {
+        console.log("hello")
         //var promptResult = prompt("Name of Cow!", "Heif-Heif");
         $('#cowModal').modal('show');
-        var data = $('cowform').serialize();
-        console.log(data)
-      //  if (promptResult != null && promptResult != "") {
-      //      addCowPin(location, map, promptResult);
-       // }
+        $('#drop').unbind().click(function(event) {
+            var name = document.getElementById("name");
+            var comments = document.getElementById("comments");
+            var type = document.getElementById("type");
+            console.log(name.value);
+          
+            if(name != null && name != "") {
+                addCowPin(location, map, name.value, comments.value, type.value)
+            }
+        });
+
     }
 
 }
@@ -136,7 +145,7 @@ var last_saved;
 var last_marker;
 var content = "";
 var color = "";
-function addCowPin(location, map, text) {
+function addCowPin(location, map, text, comments, type) {
     
     var picture = {
         url: 'https://d30y9cdsu7xlg0.cloudfront.net/png/10680-200.png',
@@ -151,9 +160,16 @@ function addCowPin(location, map, text) {
         label: text,
         icon: picture,
         text: content,
+        type: type
     });
 
+  //  var infoWindow = new google.maps.InfoWindow({
+  //          content: marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>',
+  //          height: '100px'
+  //  });
+    marker.text += '<div><p>' + comments + '</p></div>'
     last_marker = marker;
+    //last_saved = infoWindow;
 
     marker.addListener('click', function(event) {
         var infoWindow = new google.maps.InfoWindow({
@@ -163,8 +179,6 @@ function addCowPin(location, map, text) {
         last_saved = infoWindow;
         last_marker = marker;
         infoWindow.open(map, marker);
-
-
     });
 }
 
