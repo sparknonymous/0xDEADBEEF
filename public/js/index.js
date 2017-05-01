@@ -100,35 +100,10 @@ function dropCow(cowBtnText) {
         map.setOptions({
             draggable: false
         });
-         // Create a div that holds the cow-dropping button.
-    var cwBtnContainer = document.createElement('div');
-
-    // Set the CSS for the button's border.
-    var cwBtnBorder = document.createElement('div');
-    cwBtnBorder.style.backgroundColor = '#fff';
-    cwBtnBorder.style.cursor = 'pointer';
-    cwBtnBorder.style.textAlign = 'center';
-    cwBtnBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
-    cwBtnContainer.appendChild(cwBtnBorder);
-
-    // Set the CSS for the button's interior content.
-    var cwBtnText = document.createElement('div');
-    cwBtnText.style.color = '#3399ff';
-    cwBtnText.style.fontFamily = 'Arial,sans-serif';
-    cwBtnText.style.fontSize = '16px';
-    cwBtnText.style.lineHeight = '38px';
-    cwBtnText.style.paddingLeft = '10px';
-    cwBtnText.style.paddingRight = '10px';
-    cwBtnText.innerHTML = '<input id="green" type="image" height="20" width="20" src="https://d30y9cdsu7xlg0.cloudfront.net/png/10680-200.png" /> Food' 
-                        + '<input id="red" type="image" height="20" width="20" src="https://d30y9cdsu7xlg0.cloudfront.net/png/10680-200.png" /> Event'  
-    cwBtnBorder.append(cwBtnText);
-    map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(cwBtnContainer);
-    eventColor();
 
     } else {
         cowBtnText.innerHTML = "Drop a Cow!";
         dropMode = false;
-            map.controls[google.maps.ControlPosition.RIGHT_CENTER].pop(cwBtnContainer);
         map.setOptions({
             draggable: true
         });
@@ -146,11 +121,15 @@ function eventColor() {
 }
 function mapClick(location) {
     if (dropMode) {
-        var promptResult = prompt("Name of Cow!", "Heif-Heif");
-        if (promptResult != null && promptResult != "") {
-            addCowPin(location, map, promptResult);
-        }
+        //var promptResult = prompt("Name of Cow!", "Heif-Heif");
+        $('#cowModal').modal('show');
+        var data = $('cowform').serialize();
+        console.log(data)
+      //  if (promptResult != null && promptResult != "") {
+      //      addCowPin(location, map, promptResult);
+       // }
     }
+
 }
 
 var last_saved;
