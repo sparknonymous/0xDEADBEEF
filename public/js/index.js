@@ -145,6 +145,7 @@ var last_saved;
 var last_marker;
 var content = "";
 var color = "";
+var vote_text = "";
 function addCowPin(location, map, text, comments, type) {
     
     var picture = {
@@ -159,21 +160,24 @@ function addCowPin(location, map, text, comments, type) {
         map: map,
         label: text,
         icon: picture,
+        vote_text: vote_text, 
         text: content,
-        type: type
+        type: type,
+        count: 0
     });
 
   //  var infoWindow = new google.maps.InfoWindow({
   //          content: marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>',
   //          height: '100px'
   //  });
+    marker.vote_text = '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + marker.count + '</div> </div>'
     marker.text += '<div><p>' + comments + '</p></div>'
     last_marker = marker;
     //last_saved = infoWindow;
 
     marker.addListener('click', function(event) {
         var infoWindow = new google.maps.InfoWindow({
-            content: marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>',
+            content: marker.vote_text + marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>',
             height: '100px'
         });
         last_saved = infoWindow;
@@ -190,3 +194,35 @@ function addComment() {
     //last_saved.setContent('<div><p>' + promp + '</p></div>' + '</br>' + last_saved.content);
     console.log(last_saved.content)
 }
+
+function upVote() {
+    last_marker.count += 1;
+    last_marker.vote_text = '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + last_marker.count + '</div> </div>'
+}
+
+function downVote() {
+    last_marker.count -= 1;
+    last_marker.vote_text = '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + last_marker.count + '</div> </div>'
+
+}
+$(function(){
+  $(".increment").click(function(){
+    console.log("yes")
+    var count = parseInt($("~ .count", this).text());
+    
+    if($(this).hasClass("up")) {
+      var count = count + 1;
+      
+       $("~ .count", this).text(count);
+    } else {
+      var count = count - 1;
+       $("~ .count", this).text(count);     
+    }
+    
+    $(this).parent().addClass("bump");
+    
+    setTimeout(function(){
+      $(this).parent().removeClass("bump");    
+    }, 400);
+  });
+});
