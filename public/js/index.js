@@ -59,7 +59,7 @@ function initMapButton() {
 
     // Set the CSS for the button's interior content.
     var cowBtnText = document.createElement('div');
-    cowBtnText.style.color = '#3399ff';
+    cowBtnText.style.color = '#77d1ff';
     cowBtnText.style.fontFamily = 'Arial,sans-serif';
     cowBtnText.style.fontSize = '16px';
     cowBtnText.style.lineHeight = '38px';
