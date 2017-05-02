@@ -133,8 +133,8 @@ footer tab {
           flex-direction: column;
   font-family: "Noto Sans";
   position: relative;
-  width: 10rem;
-  height: 10rem;
+  width: 3rem;
+  height: 3rem;
   margin: 1rem;
 }
 
@@ -149,7 +149,7 @@ footer tab {
   cursor: pointer;
 }
 .increment.up {
-  background: #4BC35F;
+  background: green;
   height: 50%;
   margin-bottom: 0.25rem;
 }
@@ -165,12 +165,12 @@ footer tab {
   position: absolute;
   top: 0;
   border-radius: 0.1rem;
-  margin: 2.5rem;
+  margin: 1.25rem;
   background: #F6F3E4;
-  width: 5rem;
-  font-size: 2.5rem;
+  width: 0.5rem;
+  font-size: 1rem;
   font-weight: bold;
-  line-height: 5rem;
+  line-height: 0.5rem;
   text-align: center;
   box-shadow: 0 0 0 0.5rem #F6F3E4;
   pointer-events: none;

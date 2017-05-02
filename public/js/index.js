@@ -171,7 +171,7 @@ function addCowPin(location, map, text, comments, type) {
   //          height: '100px'
   //  });
     marker.vote_text = '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + marker.count + '</div> </div>'
-    marker.text += '<div><p>' + comments + '</p></div>'
+    marker.text += '<div><p>' + comments + '</p></div><hr>'
     last_marker = marker;
     //last_saved = infoWindow;
 
@@ -188,7 +188,7 @@ function addCowPin(location, map, text, comments, type) {
 
 function addComment() {
     promp = prompt("Add a comment", "");
-    last_marker.text += '<div><p>' + promp + '</p></div>';
+    last_marker.text += '<div><p>' + promp + '</p></div><hr>';
     //last_saved.setContent(last_marker.text + '</br>' + '<button onclick="addComment()">New Comment</button>')
     last_saved.close()
     //last_saved.setContent('<div><p>' + promp + '</p></div>' + '</br>' + last_saved.content);
