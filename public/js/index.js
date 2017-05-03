@@ -177,7 +177,7 @@ function addCowPin(location, map, text, comments, type) {
 
     marker.addListener('click', function(event) {
         var infoWindow = new google.maps.InfoWindow({
-            content: marker.vote_text + marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>',
+            content: marker.vote_text + marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>' + '<button onclick="deletePin()" id="dltpn">Delete Cow</button>' ,
             height: '100px'
         });
         last_saved = infoWindow;
@@ -193,6 +193,10 @@ function addComment() {
     last_saved.close()
     //last_saved.setContent('<div><p>' + promp + '</p></div>' + '</br>' + last_saved.content);
     console.log(last_saved.content)
+}
+
+function deletePin() {
+    last_marker.setMap(null);
 }
 
 function upVote() {
