@@ -1,7 +1,7 @@
 # Contributions
 
 ## Siyu
-Cleaned up code, helped with message dropping functionality.
+Cleaned up code, helped with message dropping functionality. Improved cow pin marker functionality.
 
 
 ## Ricky
