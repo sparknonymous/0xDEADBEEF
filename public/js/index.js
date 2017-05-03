@@ -62,11 +62,14 @@ function getGeoPosition() {
             radiusMarker.setVisible(false);
 
             // Set listeners to allow for message drops on the markers.
-            google.maps.event.addDomListener(centerMarker, 'click', function() {
-                return dropClick();
+            google.maps.event.addDomListener(centerMarker, 'click', function(event) {
+                console.log('yay')
+                return dropClick(event.latLng);
             });
-            google.maps.event.addDomListener(radiusMarker, 'click', function() {
-                return dropClick();
+            google.maps.event.addDomListener(radiusMarker, 'click', function(event) {
+                console.log('no')
+                console.log(event.latLng)
+                return dropClick(event.latLng);
             });
 
             /* Setup the markers such that the cursor can change, based on if the user is
@@ -182,7 +185,7 @@ function dropText(cowBtnText) {
     }
 }
 
-function dropClick() {
+function dropClick(location) {
     if (dropMode) {
         $("#guide-text").text('What\'s your next moove?');
         $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
@@ -191,7 +194,6 @@ function dropClick() {
             var name = document.getElementById("name");
             var comments = document.getElementById("comments");
             var type = document.getElementById("type");
-            console.log(name.value);
 
             if (name != null && name != "") {
                 addCowPin(location, map, name.value, comments.value, type.value)
@@ -224,9 +226,15 @@ var last_marker;
 var content = "";
 var color = "";
 var vote_text = "";
+var last_text;
+var button_text = '<button onclick="addComment()" id="commentBtn">New Comment</button>' + '<button onclick="deletePin()" id="dltpn">Delete Cow</button>'
 
 function addCowPin(location, map, text, comments, type) {
-
+    var infoWindow = new google.maps.InfoWindow({
+        //content: marker.vote_text + marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>' + '<button onclick="deletePin()" id="dltpn">Delete Cow</button>' ,
+        content: button_text,
+        height: '100px'
+    })
     var picture = {
         url: 'https://d30y9cdsu7xlg0.cloudfront.net/png/10680-200.png',
         size: new google.maps.Size(40, 40),
@@ -242,70 +250,59 @@ function addCowPin(location, map, text, comments, type) {
         vote_text: vote_text,
         text: content,
         type: type,
-        count: 0
+        count: 0,
+        infoWindow: infoWindow,
     });
 
     //  var infoWindow = new google.maps.InfoWindow({
     //          content: marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>',
     //          height: '100px'
     //  });
-    marker.vote_text = '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + marker.count + '</div> </div>'
+    marker.vote_text += '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + 0 + '</div> </div>'
     marker.text += '<div><p>' + comments + '</p></div><hr>'
     last_marker = marker;
+    last_saved = marker.infoWindow
+    last_text = marker.vote_text + marker.text;
+    marker.infoWindow.setContent(marker.vote_text + marker.text +  button_text)
+    marker.infoWindow.open(map, marker)
     //last_saved = infoWindow;
 
     marker.addListener('click', function(event) {
-        var infoWindow = new google.maps.InfoWindow({
-            content: marker.vote_text + marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>' + '<button onclick="deletePin()" id="dltpn">Delete Cow</button>' ,
-            height: '100px'
-        });
-        last_saved = infoWindow;
+        last_saved = marker.infoWindow;
         last_marker = marker;
-        infoWindow.open(map, marker);
+        marker.infoWindow.open(map, marker);
     });
 }
 
 function addComment() {
     promp = prompt("Add a comment", "");
     last_marker.text += '<div><p>' + promp + '</p></div><hr>';
+    last_text += '<div class="vote roundrect"> <div class="increment up"> </div> <div class="increment down"> </div> <div class="count">' + 0 + '</div> </div>' + '<div><p>' + promp + '</p></div><hr>'
+    last_saved.setContent(last_text + button_text)
     //last_saved.setContent(last_marker.text + '</br>' + '<button onclick="addComment()">New Comment</button>')
-    last_saved.close()
+    //last_saved.close()
     //last_saved.setContent('<div><p>' + promp + '</p></div>' + '</br>' + last_saved.content);
-    console.log(last_saved.content)
 }
 
 function deletePin() {
     last_marker.setMap(null);
 }
 
-function upVote() {
-    last_marker.count += 1;
-    last_marker.vote_text = '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + last_marker.count + '</div> </div>'
-}
-
-function downVote() {
-    last_marker.count -= 1;
-    last_marker.vote_text = '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + last_marker.count + '</div> </div>'
-
-}
-$(function() {
-    $(".increment").click(function() {
-        console.log("yes")
-        var count = parseInt($("~ .count", this).text());
-
-        if ($(this).hasClass("up")) {
-            var count = count + 1;
-
-            $("~ .count", this).text(count);
-        } else {
-            var count = count - 1;
-            $("~ .count", this).text(count);
-        }
-
-        $(this).parent().addClass("bump");
-
-        setTimeout(function() {
-            $(this).parent().removeClass("bump");
-        }, 400);
-    });
+$(document).on('click', '.increment', function(){
+    var count = parseInt($("~ .count", this).text());
+    
+    if($(this).hasClass("up")) {
+      var count = count + 1;
+      
+       $("~ .count", this).text(count);
+    } else {
+      var count = count - 1;
+       $("~ .count", this).text(count);     
+    }
+    
+    $(this).parent().addClass("bump");
+    
+    setTimeout(function(){
+      $(this).parent().removeClass("bump");    
+    }, 400);
 });
