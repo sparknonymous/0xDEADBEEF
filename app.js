@@ -6,7 +6,7 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var handlebars = require('express-handlebars')
-var index = require('./routes/index');
+var index = require('./routes/index_route');
 var app = express();
 
 // All environments.

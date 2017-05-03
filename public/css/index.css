@@ -11,12 +11,11 @@ nav {
     position: fixed;
     top: 0;
     left: 0;
-    height: 45px;
+    height: 46px;
     line-height: 45px;
     width: 100%;
     text-align: center;
-    border-bottom: 5px solid rgba(196, 196, 196, 1);
-    background-color: rgba(119, 209, 255, 1);
+    background-color: rgba(43, 132, 237, 1);
     color: white;
     font-size: 20px;
 }
@@ -37,7 +36,7 @@ main tab-section.active {
 #map-loading {
     position: fixed;
     left: 50%;
-    top: 50%;
+    top: 55%;
     margin-left: -60px;
     margin-top: -100px;
     z-index: 129;
@@ -46,22 +45,13 @@ main tab-section.active {
 #map-outer {
     position: fixed;
     width: 100%;
-    height: calc(100% - 92px);
+    height: calc(100% - 46px);
     top: 46px;
     left: 0;
 }
 
 #map {
     height: 100%;
-}
-
-#drop-cow {
-    -webkit-appearance: button;
-    -moz-appearance: button;
-    appearance: button;
-    text-decoration: none;
-    color: initial;
-    z-index: 99999;
 }
 
 footer {
@@ -73,8 +63,18 @@ footer {
     width: 100%;
     height: 45px;
     z-index: 128;
-    box-shadow: 0 0 10px rgba(150, 150, 150, 0.2);
+    box-shadow: 0 0 100px rgba(150, 150, 150, 0.2);
     background-color: rgba(255, 255, 255, 1);
+    opacity: 0.0;
+    -webkit-transition: all 0.4s ease 0s;
+    -moz-transition: all 0.4s ease 0s;
+    -ms-transition: all 0.4s ease 0s;
+    -o-transition: all 0.4s ease 0s;
+    transition: all 0.4s ease 0s;
+}
+
+footer.active {
+    opacity: 1.0;
 }
 
 footer tab {
@@ -85,138 +85,150 @@ footer tab {
     text-align: center;
     cursor: pointer;
     background-color: white;
-    color: rgba(119, 209, 255, 1);
-    line-height: 48px;
-    border-top: 5px solid rgba(196, 196, 196, 1);
+    color: rgba(43, 132, 237, 1);
     font-size: 20px;
 }
 
 @import url(http://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic,700italic);
+
 /* try 50% */
+
 .roundrect .up {
-  border-radius: 2rem 2rem 0 0;
+    border-radius: 2rem 2rem 0 0;
 }
+
 .roundrect .down {
-  border-radius: 0 0 2rem 2rem;
+    border-radius: 0 0 2rem 2rem;
 }
+
 .roundrect .count {
-  border-radius: .5rem .5rem;
+    border-radius: .5rem .5rem;
 }
 
 .chev .up {
-  border-radius: 50% 50% 0 0;
+    border-radius: 50% 50% 0 0;
 }
+
 .chev .down {
-  border-radius: 0 0 50% 50%;
+    border-radius: 0 0 50% 50%;
 }
+
 .chev .count {
-  border-radius: 100%/50%;
+    border-radius: 100%/50%;
 }
 
 .circle .up {
-  border-radius: 10rem 10rem 0 0;
+    border-radius: 10rem 10rem 0 0;
 }
+
 .circle .down {
-  border-radius: 0 0 10rem 10rem;
+    border-radius: 0 0 10rem 10rem;
 }
+
 .circle .count {
-  border-radius: 50%;
+    border-radius: 50%;
 }
 
 .vote {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  font-family: "Noto Sans";
-  position: relative;
-  width: 3rem;
-  height: 3rem;
-  margin: 1rem;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    font-family: "Noto Sans";
+    position: relative;
+    width: 3rem;
+    height: 3rem;
+    margin: 1rem;
 }
 
 .increment {
-  -webkit-box-flex: 1;
-      -ms-flex: 1 0 0;
-          flex: 1 0 0;
-  text-align: center;
-  opacity: .5;
-  -webkit-transition: 0.3s;
-  transition: 0.3s;
-  cursor: pointer;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 0 0;
+    flex: 1 0 0;
+    text-align: center;
+    opacity: .5;
+    -webkit-transition: 0.3s;
+    transition: 0.3s;
+    cursor: pointer;
 }
+
 .increment.up {
-  background: green;
-  height: 50%;
-  margin-bottom: 0.25rem;
+    background: green;
+    height: 50%;
+    margin-bottom: 0.25rem;
 }
+
 .increment.down {
-  background: #C15044;
-  height: 50%;
+    background: #C15044;
+    height: 50%;
 }
+
 .increment:hover {
-  opacity: 1;
+    opacity: 1;
 }
 
 .count {
-  position: absolute;
-  top: 0;
-  border-radius: 0.1rem;
-  margin: 1.25rem;
-  background: #F6F3E4;
-  width: 0.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  line-height: 0.5rem;
-  text-align: center;
-  box-shadow: 0 0 0 0.5rem #F6F3E4;
-  pointer-events: none;
+    position: absolute;
+    top: 0;
+    border-radius: 0.1rem;
+    margin: 1.25rem;
+    background: #F6F3E4;
+    width: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 0.5rem;
+    text-align: center;
+    box-shadow: 0 0 0 0.5rem #F6F3E4;
+    pointer-events: none;
 }
+
 .count.upvoted {
-  color: #4BC35F;
+    color: #4BC35F;
 }
+
 .count.downvoted {
-  color: #C15044;
+    color: #C15044;
 }
 
 .bump {
-  -webkit-animation: bump 200ms;
-          animation: bump 200ms;
+    -webkit-animation: bump 200ms;
+    animation: bump 200ms;
 }
 
 @-webkit-keyframes bump {
-  30% {
-    -webkit-transform: scale(1.2);
-            transform: scale(1.2);
-  }
+    30% {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+    }
 }
 
 @keyframes bump {
-  30% {
-    -webkit-transform: scale(1.2);
-            transform: scale(1.2);
-  }
+    30% {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+    }
 }
+
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 html, body {
-  height: 100%;
+    height: 100%;
 }
 
 body {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  background: #F6F3E4;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background: #F6F3E4;
 }
