@@ -1,6 +1,7 @@
 # Contributions
 
 ## Siyu
+Cleaned up code, helped with message dropping functionality.
 
 
 ## Ricky
