@@ -63,12 +63,9 @@ function getGeoPosition() {
 
             // Set listeners to allow for message drops on the markers.
             google.maps.event.addDomListener(centerMarker, 'click', function(event) {
-                console.log('yay')
                 return dropClick(event.latLng);
             });
             google.maps.event.addDomListener(radiusMarker, 'click', function(event) {
-                console.log('no')
-                console.log(event.latLng)
                 return dropClick(event.latLng);
             });
 
@@ -118,7 +115,7 @@ function getGeoPosition() {
 function markerEvent(marker) {
     if (dropMode) {
         marker.setOptions({
-            cursor: 'crosshair'
+            cursor: 'url(img/crosshair.png), auto'
         });
     } else {
         marker.setOptions({
@@ -164,14 +161,23 @@ function initMapButton() {
 
     // Setup the map listener for any clicks on the map.
     google.maps.event.addListener(map, 'click', function(event) {
-        return mapClick(event.latLng);
+        // If drop mode is enabled, there should not be clicks outside of radius.
+        if (dropMode) {
+            $("#guide-text").text("Incorrect area - select a place within the grey circle.");
+            $("#guide-text").css('color', 'rgba(209, 44, 29, 1)');
+        }
     });
 }
 
+/**
+ * Modifies the text of the message drop button, as well as the guide text.
+ * @param {object} cowBtnText - A div containing the text of the button.
+ */
 function dropText(cowBtnText) {
     if (cowBtnText.innerHTML == "Drop a Cow!") {
         cowBtnText.innerHTML = "Cancel";
         dropMode = true;
+        // Only let the radius appear if the user is dropping a message.
         radiusMarker.setVisible(true);
         map.setCenter(centerMarker.position);
         map.setZoom(18);
@@ -185,19 +191,32 @@ function dropText(cowBtnText) {
     }
 }
 
+/**
+ * Event listener for any clicks on the center or radius marker.
+ * @param {object} location - Contains latitude and longitude coordinates.
+ */
 function dropClick(location) {
     if (dropMode) {
         $("#guide-text").text('What\'s your next moove?');
         $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
         $('#cowModal').modal('show');
         $('#drop').unbind().click(function(event) {
-            var name = document.getElementById("name");
+            var topic = document.getElementById("topic");
             var comments = document.getElementById("comments");
             var type = document.getElementById("type");
 
-            if (name != null && name != "") {
-                addCowPin(location, map, name.value, comments.value, type.value)
+            // All fields must be filled to spawn a message.
+            if (topic != null && topic != "" &&
+                comments != null && comments != "" &&
+                type != null && type != "") {
+                addCowPin(location, map, name.value, comments.value, type.value);
             }
+        });
+
+        // Reverts text if the model somehow exists.
+        $("#cowModal").on('hidden.bs.modal', function() {
+            $("#guide-text").text('Drop a cow within the gray area.');
+            $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
         });
     }
 }
@@ -205,20 +224,10 @@ function dropClick(location) {
 function eventColor() {
     document.getElementById("red").addEventListener("click", function(event) {
         color = "red"
-        console.log(color)
     });
     document.getElementById("green").addEventListener("click", function(event) {
         color = "green"
-        console.log(color)
     });
-}
-
-
-function mapClick(location) {
-    if (dropMode) {
-        $("#guide-text").text("Incorrect area - select a place within the grey circle.");
-        $("#guide-text").css('color', 'rgba(209, 44, 29, 1)');
-    }
 }
 
 var last_saved;
@@ -231,14 +240,14 @@ var button_text = '<button onclick="addComment()" id="commentBtn">New Comment</b
 
 function addCowPin(location, map, text, comments, type) {
     var infoWindow = new google.maps.InfoWindow({
-        //content: marker.vote_text + marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>' + '<button onclick="deletePin()" id="dltpn">Delete Cow</button>' ,
         content: button_text,
-        height: '100px'
+        height: '200px'
     })
+
     var picture = {
-        url: 'https://d30y9cdsu7xlg0.cloudfront.net/png/10680-200.png',
-        size: new google.maps.Size(40, 40),
-        scaledSize: new google.maps.Size(40, 40),
+        url: 'img/cow.png',
+        size: new google.maps.Size(60, 60),
+        scaledSize: new google.maps.Size(60, 60),
         labelOrigin: new google.maps.Point(20, 50),
     };
 
@@ -263,7 +272,7 @@ function addCowPin(location, map, text, comments, type) {
     last_marker = marker;
     last_saved = marker.infoWindow
     last_text = marker.vote_text + marker.text;
-    marker.infoWindow.setContent(marker.vote_text + marker.text +  button_text)
+    marker.infoWindow.setContent(marker.vote_text + marker.text + button_text)
     marker.infoWindow.open(map, marker)
     //last_saved = infoWindow;
 
@@ -288,21 +297,21 @@ function deletePin() {
     last_marker.setMap(null);
 }
 
-$(document).on('click', '.increment', function(){
+$(document).on('click', '.increment', function() {
     var count = parseInt($("~ .count", this).text());
-    
-    if($(this).hasClass("up")) {
-      var count = count + 1;
-      
-       $("~ .count", this).text(count);
+
+    if ($(this).hasClass("up")) {
+        var count = count + 1;
+
+        $("~ .count", this).text(count);
     } else {
-      var count = count - 1;
-       $("~ .count", this).text(count);     
+        var count = count - 1;
+        $("~ .count", this).text(count);
     }
-    
+
     $(this).parent().addClass("bump");
-    
-    setTimeout(function(){
-      $(this).parent().removeClass("bump");    
+
+    setTimeout(function() {
+        $(this).parent().removeClass("bump");
     }, 400);
 });
