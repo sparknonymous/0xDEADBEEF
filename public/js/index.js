@@ -94,7 +94,7 @@ function getGeoPosition() {
                             $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
                         }
                     }
-                })
+                });
         }
         // Otherwise, update the locations of the markers.
         else {
@@ -209,7 +209,7 @@ function dropClick(location) {
             if (topic != null && topic != "" &&
                 comments != null && comments != "" &&
                 type != null && type != "") {
-                addCowPin(location, map, name.value, comments.value, type.value);
+                addCowPin(location, topic.value, comments.value, type.value);
             }
         });
 
@@ -221,28 +221,20 @@ function dropClick(location) {
     }
 }
 
-function eventColor() {
-    document.getElementById("red").addEventListener("click", function(event) {
-        color = "red"
-    });
-    document.getElementById("green").addEventListener("click", function(event) {
-        color = "green"
-    });
-}
+var pinMap = {}; // Dictionary of markers mapping to the info they hold.
 
-var last_saved;
-var last_marker;
-var content = "";
-var color = "";
-var vote_text = "";
-var last_text;
-var button_text = '<button onclick="addComment()" id="commentBtn">New Comment</button>' + '<button onclick="deletePin()" id="dltpn">Delete Cow</button>'
-
-function addCowPin(location, map, text, comments, type) {
+/**
+ * Adds a message pin to the clicked area.
+ * @param {object} location - Contains latitude and longtitude coordinates.
+ * @param {string} topic - Contains the topic for the message.
+ * @param {string} comments - Contains the comments for the message.
+ * @param {object} type - Contains the type of the message.
+ */
+function addCowPin(location, topic, comments, type) {
+    // Initialize pin with visuals and text.
     var infoWindow = new google.maps.InfoWindow({
-        content: button_text,
         height: '200px'
-    })
+    });
 
     var picture = {
         url: 'img/cow.png',
@@ -254,43 +246,60 @@ function addCowPin(location, map, text, comments, type) {
     var marker = new google.maps.Marker({
         position: location,
         map: map,
-        label: text,
         icon: picture,
-        vote_text: vote_text,
-        text: content,
-        type: type,
-        count: 0,
-        infoWindow: infoWindow,
+        animation: google.maps.Animation.DROP
     });
 
-    //  var infoWindow = new google.maps.InfoWindow({
-    //          content: marker.text + '<button onclick="addComment()" id="commentBtn">New Comment</button>',
-    //          height: '100px'
-    //  });
-    marker.vote_text += '<div class="vote roundrect"> <div class="increment up" onclick="upVote()"></div> <div class="increment down" onclick="downVote()"></div> <div class="count">' + 0 + '</div> </div>'
-    marker.text += '<div><p>' + comments + '</p></div><hr>'
-    last_marker = marker;
-    last_saved = marker.infoWindow
-    last_text = marker.vote_text + marker.text;
-    marker.infoWindow.setContent(marker.vote_text + marker.text + button_text)
-    marker.infoWindow.open(map, marker)
-    //last_saved = infoWindow;
-
-    marker.addListener('click', function(event) {
-        last_saved = marker.infoWindow;
-        last_marker = marker;
-        marker.infoWindow.open(map, marker);
+    marker.addListener('click', function() {
+        infoWindow.open(map, marker);
     });
+
+    // Create bounce animation when moving over cow marker.
+    marker.addListener('mouseover', function() {
+        if (marker.getAnimation() == null) {
+            setTimeout(function() {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+            }, 150);
+            setTimeout(function() {
+                marker.setAnimation(null);
+            }, 2950);
+        }
+    });
+
+    // Wait for animation to finish before opening infoWindow.
+    window.setTimeout(function() {
+        infoWindow.open(map, marker);
+    }, 600);
+
+    // Initialize the table element inside infoWindow to store comments.
+    var init_text = '<h3>' + topic + '</h3>' + '<table>';
+    init_text += parseComment(comments);
+    init_text += '</table>';
+    infoWindow.setContent(init_text);
 }
+
+/**
+ * Takes in a string, and converts it to a table element for the info window.
+ * @param {string} comments - The details of the message.
+ * @return {string} The HTML that contains the message details.
+ */
+function parseComment(comments) {
+    var content = '<tr>' + '<th>' +
+        '<div class="vote roundrect">' +
+        '<div class="increment up">' + '</div>' +
+        '<div class="increment down">' + '</div>' +
+        '<div class="count">' + 0 + '</div>' + '</div>' +
+        '</th>' + '<th>' + '<div class="comment">' + comments +
+        '</div>' + '</th>' + '</tr>';
+    return content;
+}
+
 
 function addComment() {
     promp = prompt("Add a comment", "");
     last_marker.text += '<div><p>' + promp + '</p></div><hr>';
-    last_text += '<div class="vote roundrect"> <div class="increment up"> </div> <div class="increment down"> </div> <div class="count">' + 0 + '</div> </div>' + '<div><p>' + promp + '</p></div><hr>'
-    last_saved.setContent(last_text + button_text)
-    //last_saved.setContent(last_marker.text + '</br>' + '<button onclick="addComment()">New Comment</button>')
-    //last_saved.close()
-    //last_saved.setContent('<div><p>' + promp + '</p></div>' + '</br>' + last_saved.content);
+    last_text += '<div class="vote roundrect"> <div class="increment up"> </div> <div class="increment down"> </div> <div class="count">' + 0 + '</div> </div>' + '<div><p>' + promp + '</p></div><hr>';
+    last_saved.setContent(last_text + button_text);
 }
 
 function deletePin() {
