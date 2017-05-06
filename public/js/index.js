@@ -296,8 +296,34 @@ function addCowPin(location, topic, comments, type) {
         height: '200px',
         pixelOffset: new google.maps.Size(34,32),
     });
+    
+    
+    //picture changes depending on cow type 
+     if(type=="Food"){
+         var picture = {
+        
+        url: 'img/cow food1.png',
+        size: new google.maps.Size(120, 130),
+        scaledSize: new google.maps.Size(224, 168),
+        labelOrigin: new google.maps.Point(20, 50),
+        anchor: new google.maps.Point(96,125),
 
-    var picture = {
+    };
+    }
+    if(type=="Sales"){
+        var picture = {
+        
+        url: 'img/cow sales1.png',
+        size: new google.maps.Size(120, 130),
+        scaledSize: new google.maps.Size(224, 168),
+        labelOrigin: new google.maps.Point(20, 50),
+        anchor: new google.maps.Point(96,125),
+
+    };
+    }
+    if(type=="Event"){
+        var picture = {
+        
         url: 'img/cow event1.png',
         size: new google.maps.Size(120, 130),
         scaledSize: new google.maps.Size(224, 168),
@@ -305,6 +331,11 @@ function addCowPin(location, topic, comments, type) {
         anchor: new google.maps.Point(96,125),
 
     };
+    }
+    
+
+
+    
     var shape = {
         type: 'circle',
         coords: [96,85,35],
