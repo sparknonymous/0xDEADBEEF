@@ -293,20 +293,28 @@ var infoMap = new Object(); // Mapping of info windows to their markers.
 function addCowPin(location, topic, comments, type) {
     // Initialize pin with visuals and text.
     var infoWindow = new google.maps.InfoWindow({
-        height: '200px'
+        height: '200px',
+        pixelOffset: new google.maps.Size(34,32),
     });
 
     var picture = {
-        url: 'img/cow.png',
-        size: new google.maps.Size(60, 60),
-        scaledSize: new google.maps.Size(60, 60),
+        url: 'img/cow event1.png',
+        size: new google.maps.Size(120, 130),
+        scaledSize: new google.maps.Size(224, 168),
         labelOrigin: new google.maps.Point(20, 50),
+        anchor: new google.maps.Point(96,125),
+
     };
+    var shape = {
+        type: 'circle',
+        coords: [96,85,35],
+    }
 
     var marker = new google.maps.Marker({
         position: location,
         map: map,
         icon: picture,
+        shape:shape,
         animation: google.maps.Animation.DROP
     });
 
