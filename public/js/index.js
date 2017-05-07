@@ -156,6 +156,7 @@ function initAddButton() {
     // Create a div that holds the add comment button.
     addMsgContainer = document.createElement('div');
     addMsgContainer.style.padding = "10px 10px 0px 0px";
+    addMsgContainer.className = "options";
 
     // Set the CSS for the button's border.
     var addMsgBorder = document.createElement('div');
@@ -187,6 +188,7 @@ function initDeleteButton() {
     // Create a div that holds the delete message button.
     deleteContainer = document.createElement('div');
     deleteContainer.style.padding = "10px 10px 0px 0px";
+    deleteContainer.className = "options";
 
     // Set the CSS for the button's border.
     var deleteBorder = document.createElement('div');
@@ -236,6 +238,8 @@ function enableDrop() {
     $("#guide-text").text('Drop a cow within the gray area.');
 
     // Remove the add comment and delete pin functionality if drop mode is true.
+    addMsgContainer.className = "options inactive";
+    deleteContainer.className = "options inactive";
 }
 
 /**
@@ -248,6 +252,8 @@ function disableDrop() {
     $("#guide-footer").removeClass('active');
 
     // Add the add comment and delete pin functionality if drop mode is false.
+    addMsgContainer.className = "options";
+    deleteContainer.className = "options";
 }
 
 /**
