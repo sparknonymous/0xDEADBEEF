@@ -110,6 +110,7 @@ function initMapButtons() {
     initDropButton();
     initAddButton();
     initDeleteButton();
+    initMarkers();
 }
 
 /**
@@ -211,6 +212,75 @@ function initDeleteButton() {
         return deleteMessage();
     });
 }
+
+/**
+ * Load initial markers
+ */
+
+ function initMarkers() {
+ 	$.get("get", function(markers) {
+        for(var i=0; i < markers.length; i++) {
+            //Function closure
+            (function () {
+            var location = {
+                lat: markers[i].lat,
+                lng: markers[i].lng
+            };
+
+            var picture = {
+              url: markers[i].picture,
+              size: new google.maps.Size(60, 60),
+              scaledSize: new google.maps.Size(60, 60),
+              labelOrigin: new google.maps.Point(20, 50),
+            };
+
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                icon: picture,
+                animation: google.maps.Animation.DROP
+            });
+            var infoWindow;
+
+            $.post("get_window", {
+                "lat": marker.position.lat(),
+                "lng": marker.position.lng(),
+             }, function(infowindow) {
+
+                // Initialize the table element inside infoWindow to store comments.
+                var init_text = '<h3>' + "Title" + '</h3>' + '<table>';
+                init_text += parseComment(infowindow[0].content);
+                init_text += '</table>';
+                console.log(init_text)
+                
+                infoWindow = new google.maps.InfoWindow({
+                  height: '200px',
+                  content: init_text
+                });
+ 
+             });
+
+           marker.addListener('click', function() {
+             // Initialize pin with visuals and text.
+             infoWindow.open(map, marker)
+           });
+
+               // Create bounce animation when moving over cow marker.
+            marker.addListener('mouseover', function() {
+              if (marker.getAnimation() == null) {
+              setTimeout(function() {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+              }, 150);
+              setTimeout(function() {
+                  marker.setAnimation(null);
+              }, 2950);
+              }
+            });
+
+          }());
+        }
+ 	}); 
+ }
 
 /**
  * Modifies the text of the message drop button, as well as the guide text.
@@ -315,8 +385,15 @@ function addCowPin(location, topic, comments, type) {
         icon: picture,
         animation: google.maps.Animation.DROP
     });
+    //Post marker info to routes
+    /*$.post("add_marker", { 
+          "picture": 'img/cow.png',
+          "lat": location.lat(),
+          "lng": location.lng() 
+    })*/
 
     marker.addListener('click', function() {
+    	console.log(map)
         infoWindow.open(map, marker);
     });
 
@@ -342,6 +419,14 @@ function addCowPin(location, topic, comments, type) {
     init_text += parseComment(comments);
     init_text += '</table>';
     infoWindow.setContent(init_text);
+
+    //Add window to database
+    $.post("add_window", { 
+          "content": init_text,
+          "lat": location.lat(),
+          "lng": location.lng() 
+    })
+
 
     // Map this object to the info that it contains.
     pinMap[marker] = {
