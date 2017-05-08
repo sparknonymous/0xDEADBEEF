@@ -29,11 +29,10 @@ mongoose.connect(database_uri);
 
 // Step 1: load the JSON data
 var markers_json = require('./markers.json')
-var windows_json = require('./windows.json')
 
 // Step 2: Remove all existing documents
 
-models.InfoWindow
+models.InfoBox
   .find()
   .remove()
   .exec(clear)
@@ -44,21 +43,21 @@ models.Marker
 
 
 function clear(err) {
-    var newWindow = new models.InfoWindow({
+    var newBox = new models.InfoBox({
     "content": "Hello",
     "lat": 32.8698645954428,
     "lng": -117.22189486026764
   })
 
-    newWindow.save()
+    newBox.save()
 
-  var newWindow = new models.InfoWindow({
+  var newBox = new models.InfoBox({
     "content": "Pizza",
     "lat": 32.8799645954428,
     "lng": -117.22199486026761
   })
 
-  newWindow.save()
+  newBox.save()
 
 }
 
@@ -71,9 +70,7 @@ function onceClear(err) {
   var to_save_count = markers_json.length;
   for(var i=0; i<markers_json.length; i++) {
     var json = markers_json[i];
-    var json_window = windows_json[i]
     var marker = new models.Marker(json);
-    var wind = new models.Marker(json_window)
 
     marker.save(function(err, marker) {
       if(err) console.log(err);

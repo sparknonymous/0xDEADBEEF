@@ -11,6 +11,9 @@ var cowBtnText;
 var addMsgContainer;
 var deleteContainer;
 
+var currInfo;
+var currPreview;
+
 var currentCow; // Location of cow whose message is currently expanded.
 
 var infoMap = new Object(); // Mapping of lat-lng (string) to message info.
@@ -120,7 +123,8 @@ function initMapListeners() {
         // If the map is clicked while not in drop mode, then shrink the current message open.
         else {
             if (currentCow != null) {
-                shrinkMessage(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()));
+                console.log("oop")
+                shrinkMessage2(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()), currInfo, currPreview);
                 currentCow = null;
             }
         }
@@ -259,47 +263,60 @@ function initDeleteButton() {
 
             var marker = new google.maps.Marker({
                 position: location,
+                topic: markers[i].topic,
                 map: map,
                 icon: picture,
                 animation: google.maps.Animation.DROP
             });
-            var infoWindow;
+            var infoBox;
 
-            $.post("get_window", {
+            $.post("get_box", {
                 "lat": marker.position.lat(),
                 "lng": marker.position.lng(),
-             }, function(infowindow) {
+             }, function(infobox) {
 
-                // Initialize the table element inside infoWindow to store comments.
-                var init_text = '<h3>' + "Title" + '</h3>' + '<table>';
-                init_text += parseComment(infowindow[0].content);
-                init_text += '</table>';
-                console.log(init_text)
+                var infoBox = new InfoBox({
+                    boxStyle: {
+                        borderRadius: "10px",
+                        border: "2px solid rgba(100, 100, 100, 0.5)",
+                        textAlign: "center",
+                        fontSize: "10pt",
+                        width: "200px",
+                        height: "200px",
+                        opacity: 1.0,
+                        backgroundColor: "rgba(255, 255, 255, 1.0)",
+                        overflowY: "scroll",
+                        overflowX: "hidden"
+                        },
+                    pixelOffset: new google.maps.Size(-100, -275),
+                    enableEventPropagation: true,
+                    closeBoxURL: "",
+                });   
 
-                infoWindow = new google.maps.InfoWindow({
-                  height: '200px',
-                  content: init_text
-                });
+                var previewBox = new InfoBox({
+                    boxStyle: {
+                       borderRadius: "10px",
+                       border: "2px solid rgba(100, 100, 100, 0.5)",
+                       textAlign: "center",
+                       fontSize: "10pt",
+                       width: "200px",
+                       height: "75px",
+                       opacity: 0.5,
+                       backgroundColor: "rgba(255, 255, 255, 1.0)"
+                    },
+                    pixelOffset: new google.maps.Size(-100, -150),
+                    enableEventPropagation: true,
+                    closeBoxURL: "",
+                }); 
+                loc_string = locToString(marker.position.lat(), marker.position.lng())
 
+                initMarkerListener2(marker, loc_string, infoBox, previewBox);
+                initInfoBox(infoBox, previewBox, marker.topic, infobox[0].content);
+                disableDrop();
+
+                // Attach preview to marker.
+                previewBox.open(map, marker);
              });
-
-           marker.addListener('click', function() {
-             // Initialize pin with visuals and text.
-             infoWindow.open(map, marker)
-           });
-
-               // Create bounce animation when moving over cow marker.
-            marker.addListener('mouseover', function() {
-              if (marker.getAnimation() == null) {
-              setTimeout(function() {
-                marker.setAnimation(google.maps.Animation.BOUNCE);
-              }, 150);
-              setTimeout(function() {
-                  marker.setAnimation(null);
-              }, 2950);
-              }
-            });
-
           }());
         }
  	});
@@ -444,11 +461,12 @@ function addCowPin(location, topic, comments, type) {
         animation: google.maps.Animation.DROP
     });
     //Post marker info to routes
-    /*$.post("add_marker", {
+    $.post("add_marker", {
           "picture": 'img/cow.png',
+          "topic": topic,
           "lat": location.lat(),
           "lng": location.lng()
-    })*/
+    })
 
     loc_string = locToString(location.lat(), location.lng());
 
@@ -469,9 +487,15 @@ function addCowPin(location, topic, comments, type) {
         m_previewbox: previewBox
     };
 
-    initMarkerListener(marker, loc_string);
+    initMarkerListener2(marker, loc_string, infoBox, previewBox);
     initInfoBox(infoBox, previewBox, topic, comments);
     disableDrop();
+    //Post marker info to routes
+    $.post("add_box", {
+          "lat": location.lat(),
+          "lng": location.lng(),
+          "content": comments
+    })
 
     // Wait for animation to finish before opening infoWindow.
     window.setTimeout(function() {
@@ -480,6 +504,122 @@ function addCowPin(location, topic, comments, type) {
 
     // Attach preview to marker.
     previewBox.open(map, marker);
+}
+
+/** Database functions **/
+
+/**
+ * Inits event listeners for the marker.
+ * @param {object} marker - The marker that the listener will be attached to.
+ * @param {string} location - The latitude and longitude in string form,
+ *                            separated by a space.
+ */
+function initMarkerListener2(marker, location, infoBox, previewBox) {
+    // Create bounce animation when moving over cow marker.
+    marker.addListener('mouseover', function() {
+        if (marker.getAnimation() == null) {
+            setTimeout(function() {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+            }, 150);
+            setTimeout(function() {
+                marker.setAnimation(null);
+            }, 2950);
+        }
+    });
+
+    // When the marker is clicked on, the message will be expanded.
+    marker.addListener('click', function() {
+        enlargeMessage2(location, marker, infoBox, previewBox);
+    });
+    shrinkMessage2(location, marker, infoBox, previewBox);
+}
+
+/**
+ * Given the location of a marker, the message attached to that marker will
+ * shrink down to the topic-only message.
+ * @param {string} location - The string representation of the location, should
+ *                            utilize locToString.
+ */
+function shrinkMessage2(location, infoBox, previewBox) {
+    infoBox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "200px",
+            opacity: 0.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)",
+            overflowY: "scroll",
+            overflowX: "hidden"
+        }
+    });
+
+    previewBox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "75px",
+            opacity: 0.5,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
+}
+
+/**
+ * Given the location of a marker, the message attached to that marker will
+ * expand to the full message.
+ * @param {string} location - The string representation of the location, should
+ *                            utilize locToString.
+ */
+function enlargeMessage2(location, marker, infoBox, previewBox) {
+    // Closes infoBox and returns if clicking on an open message
+    if(currInfo == infoBox) {
+        shrinkMessage2(locToString(location), currInfo, currPreview);
+        currInfo = null
+        currPreview = null
+        return;
+    }
+
+    // Shrink the contents of the previously opened message, if available.
+    if (currInfo != null) {
+       shrinkMessage2(locToString(location), currInfo, currPreview);
+    }
+    currInfo = infoBox;
+    currPreview = previewBox;
+
+    infoBox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "200px",
+            opacity: 1.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)",
+            overflowY: "scroll",
+            overflowX: "hidden"
+        }
+    });
+
+    previewBox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "75px",
+            opacity: 0.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
+    infoBox.open(map, marker)
 }
 
 /**

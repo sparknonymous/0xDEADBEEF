@@ -4,16 +4,17 @@ var Mongoose = require('mongoose');
 
 var MarkerSchema = new Mongoose.Schema({
 	"picture": String,
+	"topic": String,
 	"lat": Number,
 	"lng": Number
   // fields are defined here
 });
 
-var InfoWindowSchema = new Mongoose.Schema({
+var InfoBoxSchema = new Mongoose.Schema({
 	"content": String,
 	"lat": Number,
 	"lng": Number
 })
 
 exports.Marker = Mongoose.model('Marker', MarkerSchema);
-exports.InfoWindow = Mongoose.model('InfoWindow', InfoWindowSchema);
+exports.InfoBox = Mongoose.model('InfoBox', InfoBoxSchema);

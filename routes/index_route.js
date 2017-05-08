@@ -10,6 +10,7 @@ exports.add_marker = function(req, res) {
 	var form = req.body;
 	var newMarker = new models.Marker({
 		"picture": form.picture,
+    "topic": form.topic,
 		"lat": form.lat,
 		"lng": form.lng
 	})
@@ -34,16 +35,16 @@ exports.get_marker = function(req, res) {
 
 }
 
-exports.add_window = function(req, res) {
+exports.add_box = function(req, res) {
     var form = req.body;
     console.log(form.content)
-	var newWindow = new models.InfoWindow({
+	var newBox= new models.InfoBox({
 		"content": form.content,
 		"lat": form.lat,
 		"lng": form.lng
 	})
 
-    newWindow.save(afterSaving);
+    newBox.save(afterSaving);
 
 	function afterSaving(err) {
         if(err) {console.log(err); res.send(500);}
@@ -51,11 +52,11 @@ exports.add_window = function(req, res) {
     }
 }
 
-exports.get_window = function(req, res) {
+exports.get_box = function(req, res) {
 	var form = req.body
 	console.log(req.body.lat)
 	console.log(req.body.lng)
-	models.InfoWindow
+	models.InfoBox
     .find({"lat": req.body.lat, "lng": req.body.lng})
     .exec(afterQuery)
 
