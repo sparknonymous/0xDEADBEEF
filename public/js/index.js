@@ -11,12 +11,16 @@ var cowBtnText;
 var addMsgContainer;
 var deleteContainer;
 
+var currentCow; // Location of cow whose message is currently expanded.
+
+var infoMap = new Object(); // Mapping of lat-lng (string) to message info.
+var objectMap = new Object(); // Mapping of lat-lng (string) to marker and infobox.
+
 /**
  * Initializes the Google Map and geolocation settings.
  */
 function initMap() {
     dropMode = false;
-
     $("#map-loading").fadeOut();
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -66,10 +70,31 @@ function getGeoPosition() {
         return dropClick(event.latLng);
     });
 
+    initMapListeners();
+
+    // watchID can be used to disable continuous geolocation tracking.
+    watchID = navigator.geolocation.watchPosition(function(position) {
+        // Set the center of the map to the user's location.
+        var currPosition = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+        map.setCenter(currPosition);
+        centerMarker.setPosition(currPosition);
+    });
+}
+
+/**
+ * Inits listeners for the map.
+ */
+function initMapListeners() {
     // Radius marker should not be visible if zoomed out too much.
     google.maps.event.addDomListener(map, 'zoom_changed',
         function() {
             if (dropMode) {
+                if ($("#guide-footer").hasClass('active') == false) {
+                    $("#guide-footer").addClass('active');
+                }
                 if (map.getZoom() < 17) {
                     radiusMarker.setVisible(false);
                     $("#guide-text").text("Too far zoomed out!");
@@ -86,20 +111,19 @@ function getGeoPosition() {
     google.maps.event.addListener(map, 'click', function(event) {
         // If drop mode is enabled, there should not be clicks outside of radius.
         if (dropMode) {
+            if ($("#guide-footer").hasClass('active') == false) {
+                $("#guide-footer").addClass('active');
+            }
             $("#guide-text").text("Incorrect area - select a place within the grey circle.");
             $("#guide-text").css('color', 'rgba(209, 44, 29, 1)');
         }
-    });
-
-    // watchID can be used to disable continuous geolocation tracking.
-    watchID = navigator.geolocation.watchPosition(function(position) {
-        // Set the center of the map to the user's location.
-        var currPosition = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-        };
-        map.setCenter(currPosition);
-        centerMarker.setPosition(currPosition);
+        // If the map is clicked while not in drop mode, then shrink the current message open.
+        else {
+            if (currentCow != null) {
+                shrinkMessage(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()));
+                currentCow = null;
+            }
+        }
     });
 }
 
@@ -216,7 +240,6 @@ function initDeleteButton() {
 /**
  * Load initial markers
  */
-
  function initMarkers() {
  	$.get("get", function(markers) {
         for(var i=0; i < markers.length; i++) {
@@ -252,12 +275,12 @@ function initDeleteButton() {
                 init_text += parseComment(infowindow[0].content);
                 init_text += '</table>';
                 console.log(init_text)
-                
+
                 infoWindow = new google.maps.InfoWindow({
                   height: '200px',
                   content: init_text
                 });
- 
+
              });
 
            marker.addListener('click', function() {
@@ -279,7 +302,7 @@ function initDeleteButton() {
 
           }());
         }
- 	}); 
+ 	});
  }
 
 /**
@@ -304,8 +327,11 @@ function enableDrop() {
     radiusMarker.setVisible(true);
     map.setCenter(centerMarker.position);
     map.setZoom(18);
-    $("#guide-footer").addClass('active');
+    if ($("#guide-footer").hasClass('active') == false) {
+        $("#guide-footer").addClass('active');
+    }
     $("#guide-text").text('Drop a cow within the gray area.');
+    $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
 
     // Remove the add comment and delete pin functionality if drop mode is true.
     addMsgContainer.className = "options inactive";
@@ -319,7 +345,9 @@ function disableDrop() {
     cowBtnText.innerHTML = "Drop a Cow!";
     dropMode = false;
     radiusMarker.setVisible(false);
-    $("#guide-footer").removeClass('active');
+    if ($("#guide-footer").hasClass('active')) {
+        $("#guide-footer").removeClass('active');
+    }
 
     // Add the add comment and delete pin functionality if drop mode is false.
     addMsgContainer.className = "options";
@@ -332,6 +360,9 @@ function disableDrop() {
  */
 function dropClick(location) {
     if (dropMode) {
+        if ($("#guide-footer").hasClass('active') == false) {
+            $("#guide-footer").addClass('active');
+        }
         $("#guide-text").text('What\'s your next moove?');
         $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
         $('#cowModal').modal('show');
@@ -348,16 +379,13 @@ function dropClick(location) {
             }
         });
 
-        // Reverts text if the model somehow exists.
+        // Reverts text if the modal somehow exits.
         $("#cowModal").on('hidden.bs.modal', function() {
             $("#guide-text").text('Drop a cow within the gray area.');
             $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
         });
     }
 }
-
-var pinMap = new Object(); // Mapping of marker objects to their info.
-var infoMap = new Object(); // Mapping of info windows to their markers.
 
 /**
  * Adds a message pin to the clicked area.
@@ -368,8 +396,38 @@ var infoMap = new Object(); // Mapping of info windows to their markers.
  */
 function addCowPin(location, topic, comments, type) {
     // Initialize pin with visuals and text.
-    var infoWindow = new google.maps.InfoWindow({
-        height: '200px'
+    var infoBox = new InfoBox({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "200px",
+            opacity: 1.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)",
+            overflowY: "scroll",
+            overflowX: "hidden"
+        },
+        pixelOffset: new google.maps.Size(-100, -275),
+        enableEventPropagation: true,
+        closeBoxURL: "",
+    });
+
+    var previewBox = new InfoBox({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "75px",
+            opacity: 1.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        },
+        pixelOffset: new google.maps.Size(-100, -150),
+        enableEventPropagation: true,
+        closeBoxURL: "",
     });
 
     var picture = {
@@ -386,17 +444,51 @@ function addCowPin(location, topic, comments, type) {
         animation: google.maps.Animation.DROP
     });
     //Post marker info to routes
-    /*$.post("add_marker", { 
+    /*$.post("add_marker", {
           "picture": 'img/cow.png',
           "lat": location.lat(),
-          "lng": location.lng() 
+          "lng": location.lng()
     })*/
 
-    marker.addListener('click', function() {
-    	console.log(map)
-        infoWindow.open(map, marker);
+    loc_string = locToString(location.lat(), location.lng());
+
+    // Map the position of the marker to info relevant to the message.
+    infoMap[loc_string] = {
+        m_topic: topic,
+        m_comments: []
+    };
+    infoMap[loc_string].m_comments.push({
+        m_score: 0,
+        m_comment: comments
     });
 
+    // Map the position of the marker to the marker and infobox objects.
+    objectMap[loc_string] = {
+        m_marker: marker,
+        m_infobox: infoBox,
+        m_previewbox: previewBox
+    };
+
+    initMarkerListener(marker, loc_string);
+    initInfoBox(infoBox, previewBox, topic, comments);
+    disableDrop();
+
+    // Wait for animation to finish before opening infoWindow.
+    window.setTimeout(function() {
+        infoBox.open(map, marker);
+    }, 600);
+
+    // Attach preview to marker.
+    previewBox.open(map, marker);
+}
+
+/**
+ * Inits event listeners for the marker.
+ * @param {object} marker - The marker that the listener will be attached to.
+ * @param {string} location - The latitude and longitude in string form,
+ *                            separated by a space.
+ */
+function initMarkerListener(marker, location) {
     // Create bounce animation when moving over cow marker.
     marker.addListener('mouseover', function() {
         if (marker.getAnimation() == null) {
@@ -409,63 +501,180 @@ function addCowPin(location, topic, comments, type) {
         }
     });
 
-    // Wait for animation to finish before opening infoWindow.
-    window.setTimeout(function() {
-        infoWindow.open(map, marker);
-    }, 600);
+    // When the marker is clicked on, the message will be expanded.
+    marker.addListener('click', function() {
+        enlargeMessage(location);
+    });
+    enlargeMessage(location);
+}
 
+/**
+ * Inits the contents of the info and preview box, and then attaches both boxes
+ * to the given marker.
+ * @param {object} infoBox - Infobox object that will display the full message.
+ * @param {object} previewBox - Infobox object that only displays the topic.
+ * @param {string} topic - The topic of the message.
+ * @param {string} comments - The comment of the message.
+ */
+function initInfoBox(infoBox, previewBox, topic, comments) {
     // Initialize the table element inside infoWindow to store comments.
     var init_text = '<h3>' + topic + '</h3>' + '<table>';
-    init_text += parseComment(comments);
+    init_text += parseComment(comments, 0);
     init_text += '</table>';
-    infoWindow.setContent(init_text);
+    infoBox.setContent(init_text);
 
-    //Add window to database
-    $.post("add_window", { 
-          "content": init_text,
-          "lat": location.lat(),
-          "lng": location.lng() 
-    })
+    // Initialize the preview window with just the topic.
+    var preview_text = '<h3>' + topic + '</h3>';
+    previewBox.setContent(preview_text);
+}
 
+/**
+ * Given a latitude and longitude (in float), will create a space-separated
+ * string that has their values.
+ * @param {float} latitude - The latitude of the location.
+ * @param {float} longitude - The longitude of the location.
+ * @return {string} The string representation of the latitude-longitude coords.
+ */
+function locToString(latitude, longitude) {
+    return parseFloat(latitude) + " " + parseFloat(longitude);
+}
 
-    // Map this object to the info that it contains.
-    pinMap[marker] = {
-        marker_topic: topic,
-        marker_comment: comments,
-        marker_HTML: init_text,
-        marker_info: infoWindow
-    };
+/**
+ * Given the location of a marker, the message attached to that marker will
+ * shrink down to the topic-only message.
+ * @param {string} location - The string representation of the location, should
+ *                            utilize locToString.
+ */
+function shrinkMessage(location) {
+    objectMap[location].m_infobox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "200px",
+            opacity: 0.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)",
+            overflowY: "scroll",
+            overflowX: "hidden"
+        }
+    });
 
-    // Map the info window to the marker.
-    infoMap[infoWindow] = marker;
+    objectMap[location].m_previewbox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "75px",
+            opacity: 0.5,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
+}
+
+/**
+ * Given the location of a marker, the message attached to that marker will
+ * expand to the full message.
+ * @param {string} location - The string representation of the location, should
+ *                            utilize locToString.
+ */
+function enlargeMessage(location) {
+    // Shrink the contents of the previously opened message, if available.
+    if (currentCow != null) {
+        shrinkMessage(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()));
+    }
+
+    currentCow = objectMap[location].m_marker;
+
+    objectMap[location].m_infobox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "200px",
+            opacity: 1.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)",
+            overflowY: "scroll",
+            overflowX: "hidden"
+        }
+    });
+
+    objectMap[location].m_previewbox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "10pt",
+            width: "200px",
+            height: "75px",
+            opacity: 0.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
 }
 
 /**
  * Takes in a string, and converts it to a table element for the info window.
  * @param {string} comments - The details of the message.
+ * @param {int} score - The score of that comment.
  * @return {string} The HTML that contains the message details.
  */
-function parseComment(comments) {
+function parseComment(comments, score) {
     var content = '<tr>' + '<th>' +
         '<div class="vote roundrect">' +
         '<div class="increment up">' + '</div>' +
         '<div class="increment down">' + '</div>' +
-        '<div class="count">' + 0 + '</div>' + '</div>' +
+        '<div class="count">' + score + '</div>' + '</div>' +
         '</th>' + '<th>' + '<div class="comment">' + comments +
         '</div>' + '</th>' + '</tr>';
     return content;
 }
 
-
+/**
+ * Adds a comment to the currently opened message.
+ */
 function addComment() {
-    promp = prompt("Add a comment", "");
-    last_marker.text += '<div><p>' + promp + '</p></div><hr>';
-    last_text += '<div class="vote roundrect"> <div class="increment up"> </div> <div class="increment down"> </div> <div class="count">' + 0 + '</div> </div>' + '<div><p>' + promp + '</p></div><hr>';
-    last_saved.setContent(last_text + button_text);
+    if (currentCow != null) {
+        result = prompt("Would you like to make a cowmment?", "");
+        if(result != "") {
+            loc_string = locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng());
+            infoMap[loc_string].m_comments.push({
+                m_score: 0,
+                m_comment: result
+            });
+
+            // Recreate the contents of the message.
+            var contents = '<h3>' + infoMap[loc_string].m_topic +'</h3>' + '<table>';
+            for(var i = 0; i < infoMap[loc_string].m_comments.length; ++i) {
+                contents += parseComment(infoMap[loc_string].m_comments[i].m_comment,
+                    infoMap[loc_string].m_comments[i].m_score);
+            }
+            contents += '</table>';
+            objectMap[loc_string].m_infobox.setContent(contents);
+        }
+    } else {
+        // Print an error for the user.
+        if ($("#guide-footer").hasClass('active') == false) {
+            $("#guide-footer").addClass('active');
+        }
+        $("#guide-text").text('Please select a cow first before you add a message!');
+        $("#guide-text").css('color', 'rgba(209, 44, 29, 1)');
+
+        window.setTimeout(function() {
+            $("#guide-footer").removeClass('active');
+        }, 3000);
+    }
 }
 
-function deletePin() {
-    last_marker.setMap(null);
+function deleteMessage() {
+    if (currentCow != null) {
+        currentCow.setMap(null);
+    }
 }
 
 $(document).on('click', '.increment', function() {
