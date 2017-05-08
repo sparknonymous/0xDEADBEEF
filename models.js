@@ -5,6 +5,7 @@ var Mongoose = require('mongoose');
 var MarkerSchema = new Mongoose.Schema({
 	"picture": String,
 	"topic": String,
+	"type": String,
 	"lat": Number,
 	"lng": Number
   // fields are defined here

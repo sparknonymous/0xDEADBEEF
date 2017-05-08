@@ -464,6 +464,7 @@ function addCowPin(location, topic, comments, type) {
     $.post("add_marker", {
           "picture": 'img/cow.png',
           "topic": topic,
+          "type": type,
           "lat": location.lat(),
           "lng": location.lng()
     })
@@ -592,6 +593,7 @@ function enlargeMessage2(location, marker, infoBox, previewBox) {
     currInfo = infoBox;
     currPreview = previewBox;
     currentCow = marker;
+    console.log(currentCow.position.lat())
 
     infoBox.setOptions({
         boxStyle: {
