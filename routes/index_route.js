@@ -32,7 +32,6 @@ exports.get_marker = function(req, res) {
     if(err) console.log(err);
     res.send(markers)
   }
-
 }
 
 exports.add_box = function(req, res) {
@@ -53,16 +52,36 @@ exports.add_box = function(req, res) {
 }
 
 exports.get_box = function(req, res) {
-	var form = req.body
-	console.log(req.body.lat)
-	console.log(req.body.lng)
 	models.InfoBox
     .find({"lat": req.body.lat, "lng": req.body.lng})
     .exec(afterQuery)
 
     function afterQuery(err, infowindow) {
-      if(err) console.log(err);
+      if(err) {console.log(err); res.send(500);}
       res.send(infowindow)
   }
+}
 
+//Delete marker
+exports.delete_marker = function(req, res) {
+  models.Marker
+    .find({"lat": req.body.lat, "lng": req.body.lng})
+    .remove()
+    .exec(afterRemoving);
+
+  function afterRemoving(err, infowindow) {
+    if(err) {console.log(err); res.send(500);}
+  }    
+}
+
+//Delete marker
+exports.delete_box = function(req, res) {
+  models.InfoBox
+    .find({"lat": req.body.lat, "lng": req.body.lng})
+    .remove()
+    .exec(afterRemoving);
+
+  function afterRemoving(err, infowindow) {
+    if(err) {console.log(err); res.send(500);}
+  }    
 }

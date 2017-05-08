@@ -123,7 +123,6 @@ function initMapListeners() {
         // If the map is clicked while not in drop mode, then shrink the current message open.
         else {
             if (currentCow != null) {
-                console.log("oop")
                 shrinkMessage2(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()), currInfo, currPreview);
                 currentCow = null;
             }
@@ -308,10 +307,11 @@ function initDeleteButton() {
                     enableEventPropagation: true,
                     closeBoxURL: "",
                 }); 
-                loc_string = locToString(marker.position.lat(), marker.position.lng())
 
+                loc_string = locToString(marker.position.lat(), marker.position.lng())
                 initMarkerListener2(marker, loc_string, infoBox, previewBox);
                 initInfoBox(infoBox, previewBox, marker.topic, infobox[0].content);
+                console.log(infobox[0]._id)
                 disableDrop();
 
                 // Attach preview to marker.
@@ -591,6 +591,7 @@ function enlargeMessage2(location, marker, infoBox, previewBox) {
     }
     currInfo = infoBox;
     currPreview = previewBox;
+    currentCow = marker;
 
     infoBox.setOptions({
         boxStyle: {
@@ -779,7 +780,7 @@ function parseComment(comments, score) {
  * Adds a comment to the currently opened message.
  */
 function addComment() {
-    if (currentCow != null) {
+    if (currInfo != null) {
         result = prompt("Would you like to make a cowmment?", "");
         if(result != "") {
             loc_string = locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng());
@@ -813,7 +814,16 @@ function addComment() {
 
 function deleteMessage() {
     if (currentCow != null) {
+        $.post("delete_box", {
+            "lat": currentCow.position.lat(),
+            "lng": currentCow.position.lng(),
+        });
+        $.post("delete_marker", {
+            "lat": currentCow.position.lat(),
+            "lng": currentCow.position.lng(),
+        });
         currentCow.setMap(null);
+        currentCow = null
     }
 }
 

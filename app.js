@@ -53,7 +53,8 @@ app.post('/add_marker', index.add_marker);
 app.post('/add_box', index.add_box)
 app.get('/get', index.get_marker);
 app.post('/get_box', index.get_box)
-
+app.post('/delete_marker', index.delete_marker)
+app.post('/delete_box', index.delete_box)
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
     console.log(database_uri)
