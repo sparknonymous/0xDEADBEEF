@@ -11,12 +11,13 @@ var cowBtnText;
 var addMsgContainer;
 var deleteContainer;
 
+var currentCow; // Location of cow whose message is currently expanded.
+
 /**
  * Initializes the Google Map and geolocation settings.
  */
 function initMap() {
     dropMode = false;
-
     $("#map-loading").fadeOut();
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -88,6 +89,11 @@ function getGeoPosition() {
         if (dropMode) {
             $("#guide-text").text("Incorrect area - select a place within the grey circle.");
             $("#guide-text").css('color', 'rgba(209, 44, 29, 1)');
+        } else {
+            if(currentCow != null) {
+                shrinkMessage(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()));
+                currentCow = null;
+            }
         }
     });
 
@@ -286,8 +292,8 @@ function dropClick(location) {
     }
 }
 
-var pinMap = new Object(); // Mapping of marker objects to their info.
-var infoMap = new Object(); // Mapping of info windows to their markers.
+var infoMap = new Object(); // Mapping of lat-lng (string) to message info.
+var objectMap = new Object(); // Mapping of lat-lng (string) to marker and infobox.
 
 /**
  * Adds a message pin to the clicked area.
@@ -298,8 +304,36 @@ var infoMap = new Object(); // Mapping of info windows to their markers.
  */
 function addCowPin(location, topic, comments, type) {
     // Initialize pin with visuals and text.
-    var infoWindow = new google.maps.InfoWindow({
-        height: '200px'
+    var infoBox = new InfoBox({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "12pt",
+            width: "200px",
+            height: "200px",
+            opacity: 1.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        },
+        pixelOffset: new google.maps.Size(-100, -275),
+        enableEventPropagation: true,
+        closeBoxURL: "",
+    });
+
+    var previewBox = new InfoBox({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "12pt",
+            width: "200px",
+            height: "75px",
+            opacity: 1.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        },
+        pixelOffset: new google.maps.Size(-100, -150),
+        enableEventPropagation: true,
+        closeBoxURL: "",
     });
 
     var picture = {
@@ -316,9 +350,7 @@ function addCowPin(location, topic, comments, type) {
         animation: google.maps.Animation.DROP
     });
 
-    marker.addListener('click', function() {
-        infoWindow.open(map, marker);
-    });
+    loc_string = locToString(location.lat(), location.lng());
 
     // Create bounce animation when moving over cow marker.
     marker.addListener('mouseover', function() {
@@ -330,29 +362,154 @@ function addCowPin(location, topic, comments, type) {
                 marker.setAnimation(null);
             }, 2950);
         }
+
+        // Increase opacity of preview.
+        hoverPreviewIn(loc_string);
     });
 
-    // Wait for animation to finish before opening infoWindow.
-    window.setTimeout(function() {
-        infoWindow.open(map, marker);
-    }, 600);
+    // Decrease opacity of preview when mousing out.
+    marker.addListener('mouseout', function() {
+        hoverPreviewOut(loc_string);
+    });
 
     // Initialize the table element inside infoWindow to store comments.
     var init_text = '<h3>' + topic + '</h3>' + '<table>';
     init_text += parseComment(comments);
     init_text += '</table>';
-    infoWindow.setContent(init_text);
+    infoBox.setContent(init_text);
 
-    // Map this object to the info that it contains.
-    pinMap[marker] = {
-        marker_topic: topic,
-        marker_comment: comments,
-        marker_HTML: init_text,
-        marker_info: infoWindow
+    // Initialize the preview window with just the topic.
+    var preview_text = '<h3>' + topic + '</h3>';
+    previewBox.setContent(preview_text);
+
+    // Wait for animation to finish before opening infoWindow.
+    window.setTimeout(function() {
+        infoBox.open(map, marker);
+    }, 600);
+
+    // Attach preview to marker.
+    previewBox.open(map, marker);
+
+    // Disable drop mode.
+    disableDrop();
+
+    marker.addListener('click', function() {
+        enlargeMessage(loc_string);
+    });
+
+    infoMap[loc_string] = {
+        m_topic: topic,
+        m_score: 0,
+        m_comments: comments
     };
 
-    // Map the info window to the marker.
-    infoMap[infoWindow] = marker;
+    // Map the position of the marker to the marker and infobox objects.
+    objectMap[loc_string] = {
+        m_marker: marker,
+        m_infobox: infoBox,
+        m_previewbox: previewBox
+    };
+
+    enlargeMessage(loc_string);
+}
+
+function hoverPreviewIn(location) {
+    console.log("herer");
+    objectMap[location].m_previewbox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "12pt",
+            width: "200px",
+            height: "75px",
+            opacity: 0.80,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
+}
+
+function hoverPreviewOut(location) {
+    console.log("hello!");
+    objectMap[location].m_previewbox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "12pt",
+            width: "200px",
+            height: "75px",
+            opacity: 0.30,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
+}
+
+function locToString(latitude, longitude) {
+    return parseFloat(latitude) + " " + parseFloat(longitude);
+}
+
+function shrinkMessage(location) {
+    objectMap[location].m_infobox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "12pt",
+            width: "200px",
+            height: "200px",
+            opacity: 0.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
+
+    objectMap[location].m_previewbox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "12pt",
+            width: "200px",
+            height: "75px",
+            opacity: 0.5,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
+}
+
+function enlargeMessage(location) {
+    // Shrink the contents of the previously opened message, if available.
+    if (currentCow != null) {
+        shrinkMessage(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()));
+    }
+
+    currentCow = objectMap[location].m_marker;
+
+    objectMap[location].m_infobox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "12pt",
+            width: "200px",
+            height: "200px",
+            opacity: 1.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
+
+    objectMap[location].m_previewbox.setOptions({
+        boxStyle: {
+            borderRadius: "10px",
+            border: "2px solid rgba(100, 100, 100, 0.5)",
+            textAlign: "center",
+            fontSize: "12pt",
+            width: "200px",
+            height: "75px",
+            opacity: 0.0,
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
+        }
+    });
 }
 
 /**
@@ -373,14 +530,21 @@ function parseComment(comments) {
 
 
 function addComment() {
-    promp = prompt("Add a comment", "");
-    last_marker.text += '<div><p>' + promp + '</p></div><hr>';
-    last_text += '<div class="vote roundrect"> <div class="increment up"> </div> <div class="increment down"> </div> <div class="count">' + 0 + '</div> </div>' + '<div><p>' + promp + '</p></div><hr>';
-    last_saved.setContent(last_text + button_text);
+    if(currentCow != null) {
+        promp = prompt("Add a comment", "");
+        last_marker.text += '<div><p>' + promp + '</p></div><hr>';
+        last_text += '<div class="vote roundrect"> <div class="increment up"> </div> <div class="increment down"> </div> <div class="count">' + 0 + '</div> </div>' + '<div><p>' + promp + '</p></div><hr>';
+        last_saved.setContent(last_text + button_text);
+    }
+    else {
+
+    }
 }
 
-function deletePin() {
-    last_marker.setMap(null);
+function deleteMessage() {
+    if(currentCow != null) {
+        currentCow.setMap(null);
+    }
 }
 
 $(document).on('click', '.increment', function() {
