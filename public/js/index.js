@@ -1,6 +1,7 @@
 var map;
 var dropMode; // True if the user is trying to drop a cow.
 var watchID; // Used to disable continuous tracking of user's location.
+var markerID;
 
 // Need to store to affect visibility later on.
 var centerMarker;
@@ -123,8 +124,9 @@ function initMapListeners() {
         // If the map is clicked while not in drop mode, then shrink the current message open.
         else {
             if (currentCow != null) {
-                shrinkMessage2(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()), currInfo, currPreview);
-                currentCow = null;
+                //shrinkMessage2(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()), currInfo, currPreview);
+               // currentCow = null;
+                //console.log("rip")
             }
         }
     });
@@ -263,10 +265,14 @@ function initDeleteButton() {
             var marker = new google.maps.Marker({
                 position: location,
                 topic: markers[i].topic,
+                type: markers[i].type,
+                score: markers[i].score,
+                id: markers[i]._id,
                 map: map,
                 icon: picture,
                 animation: google.maps.Animation.DROP
             });
+            console.log(marker.score)
             var infoBox;
 
             $.post("get_box", {
@@ -309,9 +315,8 @@ function initDeleteButton() {
                 }); 
 
                 loc_string = locToString(marker.position.lat(), marker.position.lng())
-                initMarkerListener2(marker, loc_string, infoBox, previewBox);
-                initInfoBox(infoBox, previewBox, marker.topic, infobox[0].content);
-                console.log(infobox[0]._id)
+                initMarkerListener2(marker, loc_string, infoBox, previewBox, infobox[0].content);
+                initInfoBox(infoBox, previewBox, marker.topic, infobox[0].content, marker);
                 disableDrop();
 
                 // Attach preview to marker.
@@ -454,60 +459,83 @@ function addCowPin(location, topic, comments, type) {
         labelOrigin: new google.maps.Point(20, 50),
     };
 
-    var marker = new google.maps.Marker({
-        position: location,
-        map: map,
-        icon: picture,
-        animation: google.maps.Animation.DROP,
-        created: true
-    });
     //Post marker info to routes
+    var marker = ""
     $.post("add_marker", {
           "picture": 'img/cow.png',
           "topic": topic,
           "type": type,
-          "lat": location.lat(),
-          "lng": location.lng()
-    })
-    currentCow = marker;
-
-    loc_string = locToString(location.lat(), location.lng());
-
-    // Map the position of the marker to info relevant to the message.
-    infoMap[loc_string] = {
-        m_topic: topic,
-        m_comments: []
-    };
-    infoMap[loc_string].m_comments.push({
-        m_score: 0,
-        m_comment: comments
-    });
-
-    // Map the position of the marker to the marker and infobox objects.
-    objectMap[loc_string] = {
-        m_marker: marker,
-        m_infobox: infoBox,
-        m_previewbox: previewBox
-    };
-
-    initMarkerListener2(marker, loc_string, infoBox, previewBox);
-    initInfoBox(infoBox, previewBox, topic, comments);
-    disableDrop();
-    //Post marker info to routes
-    $.post("add_box", {
+          "score": 0,
           "lat": location.lat(),
           "lng": location.lng(),
-          "content": comments
-    })
+    }, function() {
+            $.post("get_current_marker", {
+                "lat": location.lat(),
+                "lng": location.lng(),
+             },
+            function(markers) {
+                markerID = markers[0]._id
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    topic: topic,
+                    type: type,
+                    score: 0,
+                    id: markerID,
+                    icon: picture,
+                    animation: google.maps.Animation.DROP,
+                    created: true
+                });
+                currentCow = marker;
 
-    // Wait for animation to finish before opening infoWindow.
-  /*  window.setTimeout(function() {
-        infoBox.open(map, marker);
-    }, 600);*/
+                loc_string = locToString(location.lat(), location.lng());
 
-    // Attach preview to marker.
-    previewBox.open(map, marker);
+                initMarkerListener2(marker, loc_string, infoBox, previewBox, comments);
+                initInfoBox(infoBox, previewBox, topic, comments, marker);
+                disableDrop();
+                //Post infobox to routes
+                $.post("add_box", {
+                    "lat": location.lat(),
+                    "lng": location.lng(),
+                    "content": comments
+                 })
+
+                previewBox.open(map, marker);
+
+            });
+
+    });
+
+
 }
+
+//Function to post marker to database
+function postMarker(topic, type, lat, lng, infoBox, previewBox,picture, callback) {
+        $.post("add_marker", {
+          "picture": 'img/cow.png',
+          "topic": topic,
+          "type": type,
+          "lat": lat,
+          "lng": lng,
+    })
+       // console.log(callback(lat, lng))
+       callback(lat, lng)
+ 
+}
+
+//Function to 
+function getMarkerID(lat, lng) {
+        $.post("get_current_marker", {
+            "lat": lat,
+            "lng": lng,
+        },
+            function(marker) {
+                markerID = marker[0]._id
+                return marker[0]._id
+            });
+    }
+
+
 
 /** Database functions **/
 
@@ -517,7 +545,7 @@ function addCowPin(location, topic, comments, type) {
  * @param {string} location - The latitude and longitude in string form,
  *                            separated by a space.
  */
-function initMarkerListener2(marker, location, infoBox, previewBox) {
+function initMarkerListener2(marker, location, infoBox, previewBox, comments) {
     // Create bounce animation when moving over cow marker.
     marker.addListener('mouseover', function() {
         if (marker.getAnimation() == null) {
@@ -532,7 +560,7 @@ function initMarkerListener2(marker, location, infoBox, previewBox) {
 
     // When the marker is clicked on, the message will be expanded.
     marker.addListener('click', function() {
-        enlargeMessage2(location, marker, infoBox, previewBox);
+        enlargeMessage2(location, marker, infoBox, previewBox, comments);
     });
     shrinkMessage2(location, marker, infoBox, previewBox);
 }
@@ -579,7 +607,7 @@ function shrinkMessage2(location, infoBox, previewBox) {
  * @param {string} location - The string representation of the location, should
  *                            utilize locToString.
  */
-function enlargeMessage2(location, marker, infoBox, previewBox) {
+function enlargeMessage2(location, marker, infoBox, previewBox, comments) {
     // Closes infoBox and returns if clicking on an open message
     if(currInfo == infoBox) {
         shrinkMessage2(locToString(location), currInfo, currPreview);
@@ -596,6 +624,8 @@ function enlargeMessage2(location, marker, infoBox, previewBox) {
     currPreview = previewBox;
     currentCow = marker;
     console.log(currentCow.position.lat())
+    initInfoBox(infoBox, previewBox, marker.topic, comments, marker);
+
 
     infoBox.setOptions({
         boxStyle: {
@@ -661,10 +691,10 @@ function initMarkerListener(marker, location) {
  * @param {string} topic - The topic of the message.
  * @param {string} comments - The comment of the message.
  */
-function initInfoBox(infoBox, previewBox, topic, comments) {
+function initInfoBox(infoBox, previewBox, topic, comments, marker) {
     // Initialize the table element inside infoWindow to store comments.
     var init_text = '<h3>' + topic + '</h3>' + '<table>';
-    init_text += parseComment(comments, 0);
+    init_text += parseComment(comments, marker.score, marker);
     init_text += '</table>';
     infoBox.setContent(init_text);
 
@@ -769,12 +799,13 @@ function enlargeMessage(location) {
  * @param {int} score - The score of that comment.
  * @return {string} The HTML that contains the message details.
  */
-function parseComment(comments, score) {
+function parseComment(comments, score, marker) {
+    var id = marker.id
     var content = '<tr>' + '<th>' +
         '<div class="vote roundrect">' +
         '<div class="increment up">' + '</div>' +
         '<div class="increment down">' + '</div>' +
-        '<div class="count">' + score + '</div>' + '</div>' +
+        '<div class="count" id="' + id +'">' + score + '</div>' + '</div>' +
         '</th>' + '<th>' + '<div class="comment">' + comments +
         '</div>' + '</th>' + '</tr>';
     return content;
@@ -847,13 +878,28 @@ function deleteMessage() {
 
 $(document).on('click', '.increment', function() {
     var count = parseInt($("~ .count", this).text());
+    console.log("voting")
+    console.log(currentCow.id)
+    var x = document.getElementById(currentCow.id)
+    console.log(currentCow.score)
+    console.log($(this).parent().html())
 
     if ($(this).hasClass("up")) {
         var count = count + 1;
+        $.post("update_score", {
+            "id": currentCow.id,
+            "score": currentCow.score + 1 ,
+        });
+        currentCow.score += 1;
 
         $("~ .count", this).text(count);
     } else {
         var count = count - 1;
+        $.post("update_score", {
+            "id": currentCow.id,
+            "score": currentCow.score - 1 ,
+        });
+        currentCow.score -= 1;
         $("~ .count", this).text(count);
     }
 

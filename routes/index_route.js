@@ -19,8 +19,9 @@ exports.add_marker = function(req, res) {
 
 	function afterSaving(err) {
         if(err) {console.log(err); res.send(500);}
+        console.log("saving")
         res.redirect('/');
-    }
+  }
 }
 
 exports.get_marker = function(req, res) {
@@ -31,6 +32,20 @@ exports.get_marker = function(req, res) {
   function afterQuery(err, markers) {
     if(err) console.log(err);
     res.send(markers)
+  }
+}
+
+exports.get_current_marker = function(req, res) {
+  console.log(req.body.lat)
+  console.log(req.body.lng)
+   models.Marker
+    .find({"lat": req.body.lat, "lng": req.body.lng})
+    .exec(afterQuery)
+
+  function afterQuery(err, marker) {
+    if(err) console.log(err);
+    console.log(marker)
+    res.send(marker)
   }
 }
 
@@ -86,4 +101,16 @@ exports.delete_box = function(req, res) {
   function afterRemoving(err) {
     if(err) {console.log(err); res.send(500);}
   }    
+}
+
+//Update marker score
+exports.update_score = function(req, res) {
+  models.Marker
+  .find({"_id": req.body.id})
+  .update({"score": req.body.score})
+  .exec(afterUpdating)
+
+    function afterUpdating(err) {
+      if(err) {console.log(err); res.send(500);}
+  }
 }

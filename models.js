@@ -6,6 +6,7 @@ var MarkerSchema = new Mongoose.Schema({
 	"picture": String,
 	"topic": String,
 	"type": String,
+	"score": Number,
 	"lat": Number,
 	"lng": Number
   // fields are defined here
