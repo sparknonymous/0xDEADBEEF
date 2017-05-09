@@ -64,12 +64,14 @@ exports.get_box = function(req, res) {
 
 //Delete marker
 exports.delete_marker = function(req, res) {
+  console.log(req.body.lat)
+  console.log(req.body.lng)
   models.Marker
     .find({"lat": req.body.lat, "lng": req.body.lng})
     .remove()
     .exec(afterRemoving);
 
-  function afterRemoving(err, infowindow) {
+  function afterRemoving(err) {
     if(err) {console.log(err); res.send(500);}
   }    
 }
@@ -81,7 +83,7 @@ exports.delete_box = function(req, res) {
     .remove()
     .exec(afterRemoving);
 
-  function afterRemoving(err, infowindow) {
+  function afterRemoving(err) {
     if(err) {console.log(err); res.send(500);}
   }    
 }

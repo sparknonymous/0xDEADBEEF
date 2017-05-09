@@ -458,7 +458,8 @@ function addCowPin(location, topic, comments, type) {
         position: location,
         map: map,
         icon: picture,
-        animation: google.maps.Animation.DROP
+        animation: google.maps.Animation.DROP,
+        created: true
     });
     //Post marker info to routes
     $.post("add_marker", {
@@ -468,6 +469,7 @@ function addCowPin(location, topic, comments, type) {
           "lat": location.lat(),
           "lng": location.lng()
     })
+    currentCow = marker;
 
     loc_string = locToString(location.lat(), location.lng());
 
@@ -499,9 +501,9 @@ function addCowPin(location, topic, comments, type) {
     })
 
     // Wait for animation to finish before opening infoWindow.
-    window.setTimeout(function() {
+  /*  window.setTimeout(function() {
         infoBox.open(map, marker);
-    }, 600);
+    }, 600);*/
 
     // Attach preview to marker.
     previewBox.open(map, marker);
@@ -814,8 +816,9 @@ function addComment() {
     }
 }
 
+//Only deletes the message if the user created it before reloading the page
 function deleteMessage() {
-    if (currentCow != null) {
+    if (currentCow != null && currentCow.created == true) {
         $.post("delete_box", {
             "lat": currentCow.position.lat(),
             "lng": currentCow.position.lng(),
@@ -826,6 +829,19 @@ function deleteMessage() {
         });
         currentCow.setMap(null);
         currentCow = null
+    }
+
+    else {
+        // Print an error for the user.
+        if ($("#guide-footer").hasClass('active') == false) {
+            $("#guide-footer").addClass('active');
+        }
+        $("#guide-text").css('color', 'rgba(209, 44, 29, 1)');
+        $("#guide-text").text('You can only delete your own cow!');
+
+        window.setTimeout(function() {
+            $("#guide-footer").removeClass('active');
+        }, 3000);
     }
 }
 
