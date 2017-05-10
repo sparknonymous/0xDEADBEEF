@@ -33,8 +33,15 @@ main tab-section.active {
     display: block;
 }
 
-table, th, td {
-    border: 0px;
+.topic-header {
+    color: rgba(43, 132, 237, 1);
+    padding-bottom: 5px;
+}
+
+.infoTable {
+    border: 1px solid black;
+    margin-left: 5px;
+    margin-bottom: 5px;
 }
 
 #map-loading {
@@ -58,6 +65,14 @@ table, th, td {
     height: 100%;
 }
 
+#add {
+    background-color: rgba(43, 132, 237, 1);
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
 .options {
     -webkit-transition: all 0.4s ease 0s;
     -moz-transition: all 0.4s ease 0s;
@@ -68,6 +83,22 @@ table, th, td {
 
 .options.inactive {
     transform: translateX(75px);
+}
+
+.modal-header {
+    background-color: rgba(43, 132, 237, 1);
+    color: rgba(255, 255, 255, 1);
+    text-align: center;
+}
+
+.add-header {
+    color: rgba(43, 132, 237, 1);
+    text-align: center;
+}
+
+.btn.btn-default.drop-btn {
+    background-color: rgba(43, 132, 237, 1);
+    color: rgba(255, 255, 255, 1);
 }
 
 footer {
@@ -116,11 +147,11 @@ footer tab {
 /* try 50% */
 
 .roundrect .up {
-    border-radius: 2rem 2rem 0 0;
+    border-radius: 4rem 4rem 0 0;
 }
 
 .roundrect .down {
-    border-radius: 0 0 2rem 2rem;
+    border-radius: 0 0 4rem 4rem;
 }
 
 .roundrect .count {
@@ -162,7 +193,7 @@ footer tab {
     font-family: "Noto Sans";
     position: relative;
     width: 3rem;
-    height: 3rem;
+    height: 5rem;
     margin: 1rem;
 }
 
@@ -194,12 +225,12 @@ footer tab {
 
 .count {
     position: absolute;
-    top: 0;
+    top: 10px;
+    left: -1.5px;
     border-radius: 0.1rem;
     margin: 1.25rem;
     background: #F6F3E4;
-    width: 0.5rem;
-    font-size: 1rem;
+    font-size: 1.75rem;
     font-weight: bold;
     line-height: 0.5rem;
     text-align: center;

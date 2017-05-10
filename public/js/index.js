@@ -3,22 +3,20 @@ var dropMode; // True if the user is trying to drop a cow.
 var watchID; // Used to disable continuous tracking of user's location.
 var markerID;
 
-// Need to store to affect visibility later on.
-var centerMarker;
-var radiusMarker;
 
-// Need to store to affect visibility later on.
+var centerMarker; // Need to store to affect visibility later on.
+var radiusMarker;
 var cowBtnText;
-var addMsgContainer;
 var deleteContainer;
 
 var currInfo;
 var currPreview;
 
 var currentCow; // Location of cow whose message is currently expanded.
-
 var infoMap = new Object(); // Mapping of lat-lng (string) to message info.
 var objectMap = new Object(); // Mapping of lat-lng (string) to marker and infobox.
+var zoomImages = [];
+var lastLocation; // Location of the last click before drop was clicked.
 
 /**
  * Initializes the Google Map and geolocation settings.
@@ -38,8 +36,27 @@ function initMap() {
 
     // If geolocation services do not exist, this app should not do anything.
     if (navigator.geolocation) {
+        // Google Maps API has loaded, init image settings.
+        zoomImages.push({
+            url: 'img/self.png',
+            size: new google.maps.Size(12.5, 12.5),
+            scaledSize: new google.maps.Size(12.5, 12.5)
+        });
+        zoomImages.push({
+            url: 'img/self.png',
+            size: new google.maps.Size(25, 25),
+            scaledSize: new google.maps.Size(25, 25)
+        });
+        zoomImages.push({
+            url: 'img/self.png',
+            size: new google.maps.Size(50, 50),
+            scaledSize: new google.maps.Size(50, 50)
+        });
+
         getGeoPosition();
         initMapButtons();
+        initMapListeners();
+        initModalListeners();
     }
 }
 
@@ -51,7 +68,7 @@ function initMap() {
 function getGeoPosition() {
     // Create a marker for the map center.
     centerMarker = new google.maps.Marker({
-        icon: 'img/self.png',
+        icon: zoomImages[1],
         map: map
     });
 
@@ -63,18 +80,19 @@ function getGeoPosition() {
         strokeWeight: 4,
         strokeColor: 'rgba(45, 252, 142, 0.5)'
     });
+
     radiusMarker.bindTo('center', centerMarker, 'position');
     radiusMarker.setVisible(false);
 
     // Set listeners to allow for message drops on the markers.
     google.maps.event.addDomListener(centerMarker, 'click', function(event) {
-        return dropClick(event.latLng);
+        lastLocation = event.latLng;
+        return dropClick();
     });
     google.maps.event.addDomListener(radiusMarker, 'click', function(event) {
-        return dropClick(event.latLng);
+        lastLocation = event.latLng;
+        return dropClick();
     });
-
-    initMapListeners();
 
     // watchID can be used to disable continuous geolocation tracking.
     watchID = navigator.geolocation.watchPosition(function(position) {
@@ -92,9 +110,18 @@ function getGeoPosition() {
  * Inits listeners for the map.
  */
 function initMapListeners() {
-    // Radius marker should not be visible if zoomed out too much.
+    // Setup the map listener for any changes in zoom.
     google.maps.event.addDomListener(map, 'zoom_changed',
         function() {
+            // Adjust size of position icon depending on zoom.
+            if (map.getZoom() < 17) {
+                centerMarker.setIcon(zoomImages[0]);
+            } else if (map.getZoom() >= 17 && map.getZoom() < 20) {
+                centerMarker.setIcon(zoomImages[1]);
+            } else {
+                centerMarker.setIcon(zoomImages[2]);
+            }
+
             if (dropMode) {
                 if ($("#guide-footer").hasClass('active') == false) {
                     $("#guide-footer").addClass('active');
@@ -123,6 +150,7 @@ function initMapListeners() {
         }
         // If the map is clicked while not in drop mode, then shrink the current message open.
         else {
+            console.log("ugh");
             if (currentCow != null) {
                 //shrinkMessage2(locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng()), currInfo, currPreview);
                // currentCow = null;
@@ -133,11 +161,36 @@ function initMapListeners() {
 }
 
 /**
+ * Inits the listeners for the modals.
+ */
+function initModalListeners() {
+    // Inits click for the drop message modal.
+    $('#drop').click(function(event) {
+        var topic = document.getElementById("topic");
+        var comments = document.getElementById("comments");
+        var type = document.getElementById("type");
+
+        // All fields must be filled to spawn a message.
+        if (topic != null && topic.value != "" &&
+            comments != null && comments.value != "" &&
+            type != null && type.value != "") {
+            addCowPin(lastLocation, topic.value, comments.value, type.value);
+        }
+
+        // Reset values for the three fields.
+        document.getElementById("topic").value = "";
+        document.getElementById("comments").value = "";
+    });
+
+    // Inits click for the view comments modal.
+    $('#add').click(addComment);
+}
+
+/**
  * Calls respective functions to create custom buttons for the map.
  */
 function initMapButtons() {
     initDropButton();
-    initAddButton();
     initDeleteButton();
     initMarkers();
 }
@@ -175,38 +228,6 @@ function initDropButton() {
     // Setup the map listener for the button.
     google.maps.event.addDomListener(cowBtnContainer, 'click', function() {
         return dropText();
-    });
-}
-
-/**
- * Creates a custom map button that allows the user to add comments to already
- * dropped messages.
- */
-function initAddButton() {
-    // Create a div that holds the add comment button.
-    addMsgContainer = document.createElement('div');
-    addMsgContainer.style.padding = "10px 10px 0px 0px";
-    addMsgContainer.className = "options";
-
-    // Set the CSS for the button's border.
-    var addMsgBorder = document.createElement('div');
-    addMsgBorder.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
-    addMsgBorder.style.cursor = 'pointer';
-    addMsgBorder.style.textAlign = 'center';
-    addMsgBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
-    addMsgContainer.appendChild(addMsgBorder);
-
-    // Set the CSS for the button's interior content.
-    var addMsgImg = document.createElement('img');
-    addMsgImg.setAttribute('src', 'img/new.png');
-    addMsgBorder.appendChild(addMsgImg);
-
-    // Inserts the finished button to the right-bottom area of the map.
-    map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(addMsgContainer);
-
-    // Setup the map listener for the button.
-    google.maps.event.addDomListener(addMsgContainer, 'click', function() {
-        return addComment();
     });
 }
 
@@ -305,7 +326,7 @@ function initDeleteButton() {
                     pixelOffset: new google.maps.Size(-100, -275),
                     enableEventPropagation: true,
                     closeBoxURL: "",
-                });   
+                });
 
                 var previewBox = new InfoBox({
                     boxStyle: {
@@ -321,7 +342,7 @@ function initDeleteButton() {
                     pixelOffset: new google.maps.Size(-100, -150),
                     enableEventPropagation: true,
                     closeBoxURL: "",
-                }); 
+                });
 
                 loc_string = locToString(marker.position.lat(), marker.position.lng())
                 initMarkerListener2(marker, loc_string, infoBox, previewBox, infobox[0].content);
@@ -356,7 +377,7 @@ function enableDrop() {
 
     // Only let the radius appear if the user is dropping a message.
     radiusMarker.setVisible(true);
-    map.setCenter(centerMarker.position);
+    map.panTo(centerMarker.position);
     map.setZoom(18);
     if ($("#guide-footer").hasClass('active') == false) {
         $("#guide-footer").addClass('active');
@@ -365,7 +386,6 @@ function enableDrop() {
     $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
 
     // Remove the add comment and delete pin functionality if drop mode is true.
-    addMsgContainer.className = "options inactive";
     deleteContainer.className = "options inactive";
 }
 
@@ -381,34 +401,20 @@ function disableDrop() {
     }
 
     // Add the add comment and delete pin functionality if drop mode is false.
-    addMsgContainer.className = "options";
     deleteContainer.className = "options";
 }
 
 /**
  * Event listener for any clicks on the center or radius marker.
- * @param {object} location - Contains latitude and longitude coordinates.
  */
-function dropClick(location) {
+function dropClick() {
     if (dropMode) {
         if ($("#guide-footer").hasClass('active') == false) {
             $("#guide-footer").addClass('active');
         }
         $("#guide-text").text('What\'s your next moove?');
         $("#guide-text").css('color', 'rgba(43, 132, 237, 1)');
-        $('#cowModal').modal('show');
-        $('#drop').unbind().click(function(event) {
-            var topic = document.getElementById("topic");
-            var comments = document.getElementById("comments");
-            var type = document.getElementById("type");
-
-            // All fields must be filled to spawn a message.
-            if (topic != null && topic != "" &&
-                comments != null && comments != "" &&
-                type != null && type != "") {
-                addCowPin(location, topic.value, comments.value, type.value);
-            }
-        });
+        $('#cowModal').modal('show'); // Reveals the modal.
 
         // Reverts text if the modal somehow exits.
         $("#cowModal").on('hidden.bs.modal', function() {
@@ -430,41 +436,37 @@ function addCowPin(location, topic, comments, type) {
     var infoBox = new InfoBox({
         boxStyle: {
             borderRadius: "10px",
-            border: "2px solid rgba(100, 100, 100, 0.5)",
+            border: "8px solid rgba(43, 132, 237, 1.0)",
             textAlign: "center",
-            fontSize: "10pt",
-            width: "200px",
-            height: "200px",
-            opacity: 1.0,
-            backgroundColor: "rgba(255, 255, 255, 1.0)",
-            overflowY: "scroll",
-            overflowX: "hidden"
+            fontSize: "12pt",
+            width: "300px",
+            display: "block",
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
         },
-        pixelOffset: new google.maps.Size(-100, -275),
-        enableEventPropagation: true,
-        closeBoxURL: "",
+        pixelOffset: new google.maps.Size(-150, -300),
+        enableEventPropagation: false,
+        closeBoxURL: ""
     });
 
     var previewBox = new InfoBox({
         boxStyle: {
             borderRadius: "10px",
-            border: "2px solid rgba(100, 100, 100, 0.5)",
+            border: "6px solid rgba(43, 132, 237, 0.5)",
             textAlign: "center",
-            fontSize: "10pt",
-            width: "200px",
-            height: "75px",
-            opacity: 1.0,
+            fontSize: "12pt",
+            width: "150px",
+            display: "block",
             backgroundColor: "rgba(255, 255, 255, 1.0)"
         },
-        pixelOffset: new google.maps.Size(-100, -150),
-        enableEventPropagation: true,
-        closeBoxURL: "",
+        pixelOffset: new google.maps.Size(-75, -175),
+        enableEventPropagation: false,
+        closeBoxURL: ""
     });
 
     var picture = {
-        url: 'img/cow.png',
-        size: new google.maps.Size(60, 60),
-        scaledSize: new google.maps.Size(60, 60),
+        url: chooseImage(type),
+        size: new google.maps.Size(100, 100),
+        scaledSize: new google.maps.Size(100, 100),
         labelOrigin: new google.maps.Point(20, 50),
     };
 
@@ -529,10 +531,10 @@ function postMarker(topic, type, lat, lng, infoBox, previewBox,picture, callback
     })
        // console.log(callback(lat, lng))
        callback(lat, lng)
- 
+
 }
 
-//Function to 
+//Function to
 function getMarkerID(lat, lng) {
         $.post("get_current_marker", {
             "lat": lat,
@@ -664,6 +666,28 @@ function enlargeMessage2(location, marker, infoBox, previewBox, comments) {
         }
     });
     infoBox.open(map, marker)
+
+    // Attach preview to marker.
+    previewBox.open(map, marker);
+
+    map.panTo(location);
+}
+
+/**
+ * Based on the type, returns a URL for the correct image.
+ * @param {string} type - The type of the message.
+ * @return {string} The location of the image.
+ */
+function chooseImage(type) {
+    if (type == "Food") {
+        return 'img/cow-food.png';
+    } else if (type == "Event") {
+        return 'img/cow-event.png';
+    } else if (type == "Sales") {
+        return 'img/cow-sales.png';
+    } else {
+        return 'img/cow.png';
+    }
 }
 
 /**
@@ -700,16 +724,49 @@ function initMarkerListener(marker, location) {
  * @param {string} topic - The topic of the message.
  * @param {string} comments - The comment of the message.
  */
-function initInfoBox(infoBox, previewBox, topic, comments, marker) {
-    // Initialize the table element inside infoWindow to store comments.
-    var init_text = '<h3>' + topic + '</h3>' + '<table>';
-    init_text += parseComment(comments, marker.score, marker);
-    init_text += '</table>';
-    infoBox.setContent(init_text);
+function initInfoBox(infoBox, previewBox, topic, comments) {
+    // Initialize the topic.
+    var topicHTML = document.createElement('h3');
+    var topicContent = document.createTextNode(topic);
+    topicHTML.className += 'topic-header';
+    topicHTML.appendChild(topicContent);
+
+    // Initialize the votes and message.
+    var commentHTML = document.createElement('table');
+    commentHTML.appendChild(parseComment(comments, 0));
+
+    // Initialize a button to trigger a comment-showing modal.
+    var viewHTML = document.createElement('div');
+    viewHTML.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
+    viewHTML.style.cursor = 'pointer';
+    viewHTML.style.textAlign = 'center';
+    viewHTML.style.margin = '-3px';
+    viewHTML.addEventListener('click', loadComments);
+
+    // Set the CSS for the button's interior content.
+    var viewText = document.createElement('div');
+    viewText.style.color = '#fff';
+    viewText.style.fontFamily = 'Arial,sans-serif';
+    viewText.style.fontSize = '16px';
+    viewText.style.lineHeight = '38px';
+    viewText.style.paddingLeft = '10px';
+    viewText.style.paddingRight = '10px';
+    viewText.innerHTML = 'View Comments';
+    viewHTML.append(viewText);
+
+    // Combine into one div.
+    var messageHTML = document.createElement('div');
+    messageHTML.appendChild(topicHTML);
+    messageHTML.appendChild(commentHTML);
+    messageHTML.appendChild(viewHTML);
+
+    infoBox.setContent(messageHTML);
 
     // Initialize the preview window with just the topic.
-    var preview_text = '<h3>' + topic + '</h3>';
-    previewBox.setContent(preview_text);
+    var previewHTML = document.createElement('h3');
+    previewHTML.className += 'topic-header';
+    previewHTML.innerHTML = topic;
+    previewBox.setContent(previewHTML);
 }
 
 /**
@@ -733,27 +790,23 @@ function shrinkMessage(location) {
     objectMap[location].m_infobox.setOptions({
         boxStyle: {
             borderRadius: "10px",
-            border: "2px solid rgba(100, 100, 100, 0.5)",
+            border: "6px solid rgba(43, 132, 237, 1.0)",
             textAlign: "center",
-            fontSize: "10pt",
-            width: "200px",
-            height: "200px",
-            opacity: 0.0,
-            backgroundColor: "rgba(255, 255, 255, 1.0)",
-            overflowY: "scroll",
-            overflowX: "hidden"
+            fontSize: "12pt",
+            width: "300px",
+            display: "none",
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
         }
     });
 
     objectMap[location].m_previewbox.setOptions({
         boxStyle: {
             borderRadius: "10px",
-            border: "2px solid rgba(100, 100, 100, 0.5)",
+            border: "6px solid rgba(43, 132, 237, 0.5)",
             textAlign: "center",
-            fontSize: "10pt",
-            width: "200px",
-            height: "75px",
-            opacity: 0.5,
+            fontSize: "12pt",
+            width: "150px",
+            display: "block",
             backgroundColor: "rgba(255, 255, 255, 1.0)"
         }
     });
@@ -776,27 +829,23 @@ function enlargeMessage(location) {
     objectMap[location].m_infobox.setOptions({
         boxStyle: {
             borderRadius: "10px",
-            border: "2px solid rgba(100, 100, 100, 0.5)",
+            border: "6px solid rgba(43, 132, 237, 1.0)",
             textAlign: "center",
-            fontSize: "10pt",
-            width: "200px",
-            height: "200px",
-            opacity: 1.0,
-            backgroundColor: "rgba(255, 255, 255, 1.0)",
-            overflowY: "scroll",
-            overflowX: "hidden"
+            fontSize: "12pt",
+            width: "300px",
+            display: "block",
+            backgroundColor: "rgba(255, 255, 255, 1.0)"
         }
     });
 
     objectMap[location].m_previewbox.setOptions({
         boxStyle: {
             borderRadius: "10px",
-            border: "2px solid rgba(100, 100, 100, 0.5)",
+            border: "6px solid rgba(43, 132, 237, 0.5)",
             textAlign: "center",
-            fontSize: "10pt",
-            width: "200px",
-            height: "75px",
-            opacity: 0.0,
+            fontSize: "12pt",
+            width: "150px",
+            display: "none",
             backgroundColor: "rgba(255, 255, 255, 1.0)"
         }
     });
@@ -806,53 +855,99 @@ function enlargeMessage(location) {
  * Takes in a string, and converts it to a table element for the info window.
  * @param {string} comments - The details of the message.
  * @param {int} score - The score of that comment.
- * @return {string} The HTML that contains the message details.
+ * @return {object} The DOM object that contains the message details.
  */
-function parseComment(comments, score, marker) {
-    var id = marker.id
-    var content = '<tr>' + '<th>' +
-        '<div class="vote roundrect">' +
-        '<div class="increment up">' + '</div>' +
-        '<div class="increment down">' + '</div>' +
-        '<div class="count" id="' + id +'">' + score + '</div>' + '</div>' +
-        '</th>' + '<th>' + '<div class="comment">' + comments +
-        '</div>' + '</th>' + '</tr>';
-    return content;
+function parseComment(comments, score) {
+    var tableRow = document.createElement('tr');
+
+    // Init voting segment.
+    var voteHeader = document.createElement('th');
+    var voteDiv = document.createElement('div');
+    voteDiv.className += 'vote chev';
+    var upvoteDiv = document.createElement('div');
+    upvoteDiv.className += 'increment up';
+    var downvoteDiv = document.createElement('div');
+    downvoteDiv.className += 'increment down';
+    var countDiv = document.createElement('div');
+    countDiv.className += 'count';
+    countDiv.innerHTML = score;
+
+    // Init comment segment.
+    var commentHeader = document.createElement('th');
+    var commentDiv = document.createElement('div');
+    commentDiv.className += 'comment';
+    commentDiv.innerHTML = comments;
+
+    // Put the two headers together into the row of the table.
+    tableRow.appendChild(voteHeader);
+    tableRow.appendChild(commentHeader);
+
+    voteHeader.appendChild(voteDiv);
+    voteDiv.appendChild(upvoteDiv);
+    voteDiv.appendChild(downvoteDiv);
+    voteDiv.appendChild(countDiv);
+
+    commentHeader.appendChild(commentDiv);
+
+    return tableRow;
+}
+
+/**
+ * Loads the contents of one message cow into the modal.
+ */
+function loadComments() {
+    loc_string = locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng());
+    // Clear the contents of the modal.
+    var commentsDiv = document.getElementById("comments-div");
+    if (commentsDiv != null) {
+        commentsDiv.innerHTML = "";
+    }
+
+    // Recreate the contents of the message.
+    var topicHeader = document.getElementById("topic-header");
+    if (topicHeader != null) {
+        topicHeader.innerHTML = infoMap[loc_string].m_topic;
+    }
+
+    var mainComment = document.createElement('table');
+    mainComment.className += 'comments-table';
+    mainComment.id = 'main-comment';
+    mainComment.appendChild(parseComment(infoMap[loc_string].m_comments[0].m_comment,
+        infoMap[loc_string].m_comments[0].m_score));
+    commentsDiv.appendChild(mainComment);
+
+    if (infoMap[loc_string].m_comments.length > 1) {
+        var otherComments = document.createElement('table');
+        otherComments.className += 'comments-table';
+        otherComments.id = 'other-comments';
+
+        for (var i = 1; i < infoMap[loc_string].m_comments.length; ++i) {
+            otherComments.appendChild(parseComment(infoMap[loc_string].m_comments[i].m_comment,
+                infoMap[loc_string].m_comments[i].m_score));
+        }
+
+        var line = document.createElement('hr');
+
+        commentsDiv.appendChild(line);
+        commentsDiv.appendChild(otherComments);
+    }
+
+    $('#commentsModal').modal('show'); // Reveals the modal.
 }
 
 /**
  * Adds a comment to the currently opened message.
  */
 function addComment() {
-    if (currInfo != null) {
-        result = prompt("Would you like to make a cowmment?", "");
-        if(result != "") {
-            loc_string = locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng());
-            infoMap[loc_string].m_comments.push({
-                m_score: 0,
-                m_comment: result
-            });
-
-            // Recreate the contents of the message.
-            var contents = '<h3>' + infoMap[loc_string].m_topic +'</h3>' + '<table>';
-            for(var i = 0; i < infoMap[loc_string].m_comments.length; ++i) {
-                contents += parseComment(infoMap[loc_string].m_comments[i].m_comment,
-                    infoMap[loc_string].m_comments[i].m_score);
-            }
-            contents += '</table>';
-            objectMap[loc_string].m_infobox.setContent(contents);
-        }
-    } else {
-        // Print an error for the user.
-        if ($("#guide-footer").hasClass('active') == false) {
-            $("#guide-footer").addClass('active');
-        }
-        $("#guide-text").text('Please select a cow first before you add a message!');
-        $("#guide-text").css('color', 'rgba(209, 44, 29, 1)');
-
-        window.setTimeout(function() {
-            $("#guide-footer").removeClass('active');
-        }, 3000);
+    loc_string = locToString(currentCow.getPosition().lat(), currentCow.getPosition().lng());
+    var commentBox = document.getElementById("add-comment");
+    if (commentBox.value != "") {
+        infoMap[loc_string].m_comments.push({
+            m_score: 0,
+            m_comment: commentBox.value
+        });
+        commentBox.value = "";
+        loadComments();
     }
 }
 
