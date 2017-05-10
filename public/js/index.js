@@ -11,10 +11,6 @@ var cowBtnText;
 var addMsgContainer;
 var deleteContainer;
 
-
-var marker;
-
-
 /**
  * Initializes the Google Map and geolocation settings.
  */
@@ -297,68 +293,20 @@ var infoMap = new Object(); // Mapping of info windows to their markers.
 function addCowPin(location, topic, comments, type) {
     // Initialize pin with visuals and text.
     var infoWindow = new google.maps.InfoWindow({
-        height: '200px',
-        pixelOffset: new google.maps.Size(34,32),
+        height: '200px'
     });
-    
-    
 
-    //all possible icons
-    var event1 = {
-        
-        url: 'img/cow event1.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
+    var picture = {
+        url: 'img/cow.png',
+        size: new google.maps.Size(60, 60),
+        scaledSize: new google.maps.Size(60, 60),
         labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
     };
- 
-     var food1 = {
-        
-        url: 'img/cow food1.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     
-      var sales1 = {
-        
-        url: 'img/cow sales1.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-    
 
-    
-    //picture changes depending on cow type 
-     if(type=="Food"){
-         var picture = food1;
-    
-    }
-     if(type=="Sales"){
-        var picture = sales1;
-    }
-     if(type=="Event"){
-        var picture = event1;
-    }
-    
-
-
-    //shape of clickable area on icon
-    var shape = {
-        type: 'circle',
-        coords: [96,85,35],
-    }
-
-    
-     marker = new google.maps.Marker({
+    var marker = new google.maps.Marker({
         position: location,
         map: map,
         icon: picture,
-        shape:shape,
         animation: google.maps.Animation.DROP
     });
 
@@ -431,293 +379,14 @@ function deletePin() {
 
 $(document).on('click', '.increment', function() {
     var count = parseInt($("~ .count", this).text());
-    
 
-    //all possible icons
-    var event1 = {
-        
-        url: 'img/cow event1.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
- 
-    var event2 = {
-        
-        url: 'img/cow event2.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-    var event3 = {
-        
-        url: 'img/cow event3.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var event4 = {
-        
-        url: 'img/cow event4.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var event5 = {
-        
-        url: 'img/cow event5.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var food1 = {
-        
-        url: 'img/cow food1.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var food2 = {
-        
-        url: 'img/cow food2.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var food3 = {
-        
-        url: 'img/cow food3.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var food4 = {
-        
-        url: 'img/cow food4.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var food5 = {
-        
-        url: 'img/cow food5.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var sales1 = {
-        
-        url: 'img/cow sales1.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var sales2 = {
-        
-        url: 'img/cow sales2.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var sales3 = {
-        
-        url: 'img/cow sales3.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var sales4 = {
-        
-        url: 'img/cow sales4.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-     var sales5 = {
-        
-        url: 'img/cow sales5.png',
-        size: new google.maps.Size(120, 130),
-        scaledSize: new google.maps.Size(224, 168),
-        labelOrigin: new google.maps.Point(20, 50),
-        anchor: new google.maps.Point(96,125),
-    };
-
-
-    
-
-    
     if ($(this).hasClass("up")) {
         var count = count + 1;
 
         $("~ .count", this).text(count);
-
-
-        //change icon based on how many votes
-        if(count==20&&type.value=="Food"){
-        
-           marker.setIcon(food2);
-
-        }
-
-        if(count==20&&type.value=="Event"){
-        
-           marker.setIcon(event2);
-           
-        }
-
-        if(count==20&&type.value=="Sales"){
-        
-           marker.setIcon(sales2);
-           
-        }
-
-
-        if(count==50&&type.value=="Food"){
-        
-           marker.setIcon(food3);
-
-        }
-
-        if(count==50&&type.value=="Event"){
-        
-           marker.setIcon(event3);
-           
-        }
-
-        if(count==50&&type.value=="Sales"){
-        
-           marker.setIcon(sales3);
-           
-        }
-
-        if(count==100&&type.value=="Food"){
-        
-           marker.setIcon(food4);
-
-        }
-
-        if(count==100&&type.value=="Event"){
-        
-           marker.setIcon(event4);
-           
-        }
-
-        if(count==100&&type.value=="Sales"){
-        
-           marker.setIcon(sales4);
-           
-        }
-
-        if(count==200&&type.value=="Food"){
-        
-           marker.setIcon(food5);
-
-        }
-
-        if(count==200&&type.value=="Event"){
-        
-           marker.setIcon(event5);
-           
-        }
-
-        if(count==200&&type.value=="Sales"){
-        
-           marker.setIcon(sales5);
-           
-        }
-        
     } else {
         var count = count - 1;
         $("~ .count", this).text(count);
-
-        
-        //change icon based on how many votes
-         if(count==19&&type.value=="Food"){
-        
-           marker.setIcon(food1);
-
-        }
-
-        if(count==19&&type.value=="Event"){
-        
-           marker.setIcon(event1);
-           
-        }
-
-        if(count==19&&type.value=="Sales"){
-        
-           marker.setIcon(sales1);
-           
-        }
-
-        if(count==49&&type.value=="Food"){
-        
-           marker.setIcon(food2);
-
-        }
-
-        if(count==49&&type.value=="Event"){
-        
-           marker.setIcon(event2);
-           
-        }
-
-        if(count==49&&type.value=="Sales"){
-        
-           marker.setIcon(sales2);
-           
-        }
-
-        if(count==99&&type.value=="Food"){
-        
-           marker.setIcon(food3);
-
-        }
-
-        if(count==99&&type.value=="Event"){
-        
-           marker.setIcon(event3);
-           
-        }
-
-        if(count==99&&type.value=="Sales"){
-        
-           marker.setIcon(sales3);
-           
-        }
-
-        if(count==199&&type.value=="Food"){
-        
-           marker.setIcon(food4);
-
-        }
-
-        if(count==199&&type.value=="Event"){
-        
-           marker.setIcon(event4);
-           
-        }
-
-        if(count==199&&type.value=="Sales"){
-        
-           marker.setIcon(sales4);
-           
-        }
-        
     }
 
     $(this).parent().addClass("bump");
