@@ -58,6 +58,8 @@ app.post('/delete_marker', index.delete_marker)
 app.post('/delete_box', index.delete_box)
 app.post('/update_score', index.update_score)
 app.post('/get_comments', index.get_comments)
+app.post('/get_comment', index.get_comment)
+app.post('/add_comment', index.add_comment)
 
 
 http.createServer(app).listen(app.get('port'), function() {

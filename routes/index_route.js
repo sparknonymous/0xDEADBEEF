@@ -11,6 +11,9 @@ exports.add_marker = function(req, res) {
 	var newMarker = new models.Marker({
 		"picture": form.picture,
     "topic": form.topic,
+    "type": form.type,
+    "comment": form.comment,
+    "score": form.score,
 		"lat": form.lat,
 		"lng": form.lng
 	})
@@ -103,14 +106,24 @@ exports.delete_box = function(req, res) {
   }    
 }
 
-//Update marker score
+//Update marker score if main comment, else update comment score
 exports.update_score = function(req, res) {
-  models.Marker
-  .find({"_id": req.body.id})
+  console.log(req.body.score)
+  if(req.body.type == "other") {
+  models.Comment
+  .find({"lat": req.body.lat, "lng": req.body.lng, "content": req.body.content})
   .update({"score": req.body.score})
   .exec(afterUpdating)
+  }
 
-    function afterUpdating(err) {
+  else {
+    models.Marker
+    .find({"lat": req.body.lat, "lng": req.body.lng})
+    .update({"score": req.body.score})
+    .exec(afterUpdating)
+  }
+
+    function afterUpdating(err, vote) {
       if(err) {console.log(err); res.send(500);}
   }
 }
@@ -123,7 +136,36 @@ exports.get_comments = function(req, res) {
 
   function afterQuery(err, comments) {
     if(err) {console.log(err); res.send(500);}
-    console.log(comments)
     res.send(comments)
   }
+}
+
+//Get one comment
+exports.get_comment = function(req, res) {
+  models.Comment
+  .find({"lat": req.body.lat, "lng": req.body.lng, "content": req.body.content})
+  .exec(afterQuery)
+
+  function afterQuery(err, comment) {
+    if(err) {console.log(err); res.send(500);}
+    res.send(comment)
+  }
+}
+//Add comment
+exports.add_comment = function(req, res) {
+  var form = req.body;
+  var newComment = new models.Comment({
+    "content": form.content,
+    "score": form.score,
+    "lat": form.lat,
+    "lng": form.lng
+  })
+
+  newComment.save(afterSaving);
+
+  function afterSaving(err) {
+        if(err) {console.log(err); res.send(500);}
+        res.redirect('/');
+  }
+
 }

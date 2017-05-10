@@ -6,10 +6,11 @@ var MarkerSchema = new Mongoose.Schema({
 	"picture": String,
 	"topic": String,
 	"type": String,
+	"comment": String,
 	"score": Number,
 	"lat": Number,
-	"lng": Number
-  // fields are defined here
+	"lng": Number,
+	//"createdAt": {type: Date, expires: 10, default: Date.now }
 });
 
 var InfoBoxSchema = new Mongoose.Schema({
