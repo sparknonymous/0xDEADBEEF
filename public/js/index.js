@@ -272,8 +272,17 @@ function initDeleteButton() {
                 icon: picture,
                 animation: google.maps.Animation.DROP
             });
-            console.log(marker.score)
+            console.log(marker.id)
             var infoBox;
+
+            $.post("get_comments", {
+                "lat": marker.position.lat(),
+                "lng": marker.position.lng(),
+            }, function(comments) {
+                for(var j = 0; j < comments.length; j++) {
+                  console.log(comments[j].content)
+                }
+            });
 
             $.post("get_box", {
                 "lat": marker.position.lat(),

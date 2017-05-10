@@ -57,6 +57,7 @@ app.post('/get_box', index.get_box)
 app.post('/delete_marker', index.delete_marker)
 app.post('/delete_box', index.delete_box)
 app.post('/update_score', index.update_score)
+app.post('/get_comments', index.get_comments)
 
 
 http.createServer(app).listen(app.get('port'), function() {

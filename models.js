@@ -18,5 +18,13 @@ var InfoBoxSchema = new Mongoose.Schema({
 	"lng": Number
 })
 
+var CommentSchema = new Mongoose.Schema({
+	"content": String,
+	"score": Number,
+	"lat": Number,
+	"lng": Number
+})
+
 exports.Marker = Mongoose.model('Marker', MarkerSchema);
 exports.InfoBox = Mongoose.model('InfoBox', InfoBoxSchema);
+exports.Comment = Mongoose.model('Comment', CommentSchema);

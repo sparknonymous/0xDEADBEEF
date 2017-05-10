@@ -114,3 +114,16 @@ exports.update_score = function(req, res) {
       if(err) {console.log(err); res.send(500);}
   }
 }
+
+//Get comments
+exports.get_comments = function(req, res) {
+  models.Comment
+  .find({"lat": req.body.lat, "lng": req.body.lng})
+  .exec(afterQuery)
+
+  function afterQuery(err, comments) {
+    if(err) {console.log(err); res.send(500);}
+    console.log(comments)
+    res.send(comments)
+  }
+}

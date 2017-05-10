@@ -35,14 +35,20 @@ var markers_json = require('./markers.json')
 models.InfoBox
   .find()
   .remove()
-  .exec(clear)
+  .exec(clearInfo)
+
+models.Comment
+  .find()
+  .remove()
+  .exec(clearComment)
 
 models.Marker
   .find()
   .remove(onceClear)
 
 
-function clear(err) {
+
+function clearInfo(err) {
     var newBox = new models.InfoBox({
     "content": "Hello",
     "lat": 32.8698645954428,
@@ -58,7 +64,35 @@ function clear(err) {
   })
 
   newBox.save()
+}
 
+function clearComment(err) {
+    var newComment = new models.Comment({
+    "content": "It's great",
+    "score": 0,
+    "lat": 32.8698645954428,
+    "lng": -117.22189486026764
+    })
+
+    newComment.save()
+
+    var newComment = new models.Comment({
+    "content": "Amazing",
+    "score": 0,
+    "lat": 32.8698645954428,
+    "lng": -117.22189486026764
+    })
+
+    newComment.save()
+
+  var newComment = new models.Comment({
+    "content": "Super long line",
+    "score": 0,
+    "lat": 32.8799645954428,
+    "lng": -117.22199486026761
+  })
+
+  newComment.save()
 }
 
 // Step 3: load the data from the JSON file
