@@ -58,6 +58,18 @@ table, th, td {
     height: 100%;
 }
 
+.options {
+    -webkit-transition: all 0.4s ease 0s;
+    -moz-transition: all 0.4s ease 0s;
+    -ms-transition: all 0.4s ease 0s;
+    -o-transition: all 0.4s ease 0s;
+    transition: all 0.4s ease 0s;
+}
+
+.options.inactive {
+    transform: translateX(75px);
+}
+
 footer {
     position: fixed;
     bottom: 0;
@@ -67,6 +79,7 @@ footer {
     width: 100%;
     height: 45px;
     z-index: 128;
+    transform: translateY(5px);
     box-shadow: 0 0 100px rgba(150, 150, 150, 0.2);
     background-color: rgba(255, 255, 255, 1);
     opacity: 0.0;
@@ -78,6 +91,7 @@ footer {
 }
 
 footer.active {
+    bottom: 5px;
     opacity: 1.0;
 }
 
