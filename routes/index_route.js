@@ -11,6 +11,8 @@ exports.add_marker = function(req, res) {
 	var newMarker = new models.Marker({
 		"picture": form.picture,
     "topic": form.topic,
+    "type": form.type,
+    "score": form.score,
 		"lat": form.lat,
 		"lng": form.lng
 	})
