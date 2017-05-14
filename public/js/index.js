@@ -2,12 +2,18 @@ var map;
 var dropMode; // True if the user is trying to drop a cow.
 var watchID; // Used to disable continuous tracking of user's location.
 var markerID;
+var filterMode;
 
 
 var centerMarker; // Need to store to affect visibility later on.
 var radiusMarker;
 var cowBtnText;
 var deleteContainer;
+var filterContainer;
+var cowBtnContainer;
+var CheckContainer;
+var CheckContainer2;
+var CheckContainer3;
 
 var currInfo;
 var currPreview;
@@ -23,6 +29,7 @@ var lastLocation; // Location of the last click before drop was clicked.
  */
 function initMap() {
     dropMode = false;
+    filterMode = false;
     $("#map-loading").fadeOut();
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -192,7 +199,15 @@ function initModalListeners() {
 function initMapButtons() {
     initDropButton();
     initDeleteButton();
+    initFilterBox();
+    initCheckbox1();
+    initCheckbox2();
+    initCheckbox3();
     initMarkers();
+    CheckContainer.className = "options inactive";
+    CheckContainer2.className = "options inactive";
+    CheckContainer3.className = "options inactive";
+    
 }
 
 /**
@@ -201,7 +216,7 @@ function initMapButtons() {
  */
 function initDropButton() {
     // Create a div that holds the cow-dropping button.
-    var cowBtnContainer = document.createElement('div');
+    cowBtnContainer = document.createElement('div');
 
     // Set the CSS for the button's border.
     var cowBtnBorder = document.createElement('div');
@@ -230,6 +245,197 @@ function initDropButton() {
         return dropText();
     });
 }
+
+function initFilterBox() {
+    
+    filterContainer = document.createElement('div');
+    //filterContainer.style.padding = "10px 0px 0px 0px";
+
+    
+   
+
+
+    var filterBorder = document.createElement('div');
+    filterBorder.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
+    filterBorder.style.cursor = 'pointer';
+    //filterBorder.style.textAlign = 'center';
+    filterBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    filterContainer.appendChild(filterBorder);
+
+
+
+
+
+    filterText = document.createElement('div');
+    filterText.style.color = '#fff';
+    filterText.style.fontFamily = 'Arial,sans-serif';
+    filterText.style.fontSize = '16px';
+    filterText.style.lineHeight = '38px';
+    filterText.style.paddingLeft = '15px';
+    filterText.style.paddingRight = '15px';
+    filterText.innerHTML = 'Filter Cows';
+    filterBorder.append(filterText);
+
+    
+
+    
+    map.controls[google.maps.ControlPosition.RIGHT].push(filterContainer);
+
+    google.maps.event.addDomListener(filterContainer, 'click', function() {
+        return filterCows();
+    });
+
+   
+}
+
+function initCheckbox1(){
+
+    CheckContainer = document.createElement('div');
+    CheckContainer.style.padding = "0px 16px 0px 10px";
+
+    var boxBorder = document.createElement('div');
+    boxBorder.style.backgroundColor = 'white';
+    boxBorder.style.cursor = 'pointer';
+    boxBorder.style.textAlign = 'center';
+    //boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    CheckContainer.appendChild(boxBorder);
+    
+
+    
+
+    var checkBorder = document.createElement('label');
+    checkBorder.className= 'switch';
+    checkBorder.style.cursor = 'pointer';
+    boxBorder.append(checkBorder);
+
+    checkText = document.createElement('div');
+    checkText.style.color =  '#ccc';
+    checkText.style.fontFamily = 'Arial,sans-serif';
+    checkText.style.fontSize = '16px';
+    checkText.style.lineHeight = '38px';
+    checkText.style.paddingLeft = '17px';
+    checkText.style.paddingRight = '17px';
+    checkText.innerHTML = 'Food:';
+    checkBorder.before(checkText);
+
+    var border = document.createElement('input');
+    border.className= 'switch';
+    border.type= 'checkbox';
+    checkBorder.append(border);
+
+    var slider = document.createElement('div');
+    slider.className= 'slider round';
+    checkBorder.append(slider);
+
+  
+
+
+
+    map.controls[google.maps.ControlPosition.RIGHT].push(CheckContainer);
+
+
+
+
+}
+
+function initCheckbox2(){
+
+    CheckContainer2 = document.createElement('div');
+    CheckContainer2.style.padding = "0px 16px 0px 10px";
+
+    var boxBorder = document.createElement('div');
+    boxBorder.style.backgroundColor = 'white';
+    boxBorder.style.cursor = 'pointer';
+    boxBorder.style.textAlign = 'center';
+    //boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    CheckContainer2.appendChild(boxBorder);
+    
+
+    
+
+    var checkBorder = document.createElement('label');
+    checkBorder.className= 'switch';
+    checkBorder.style.cursor = 'pointer';
+    boxBorder.append(checkBorder);
+
+    checkText = document.createElement('div');
+    checkText.style.color =  '#ccc';
+    checkText.style.fontFamily = 'Arial,sans-serif';
+    checkText.style.fontSize = '16px';
+    checkText.style.lineHeight = '38px';
+    checkText.style.paddingLeft = '15px';
+    checkText.style.paddingRight = '15px';
+    checkText.innerHTML = 'Event:';
+    checkBorder.before(checkText);
+
+    var border = document.createElement('input');
+    border.className= 'switch';
+    border.type= 'checkbox';
+    checkBorder.append(border);
+
+    var slider = document.createElement('div');
+    slider.className= 'slider round';
+    checkBorder.append(slider);
+
+
+
+
+    map.controls[google.maps.ControlPosition.RIGHT].push(CheckContainer2);
+
+
+
+
+}
+
+function initCheckbox3(){
+
+    CheckContainer3 = document.createElement('div');
+    CheckContainer3.style.padding = "0px 16px 0px 10px";
+
+    var boxBorder = document.createElement('div');
+    boxBorder.style.backgroundColor = 'white';
+    boxBorder.style.cursor = 'pointer';
+    boxBorder.style.textAlign = 'center';
+    //boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    CheckContainer3.appendChild(boxBorder);
+    
+
+    
+
+    var checkBorder = document.createElement('label');
+    checkBorder.className= 'switch';
+    checkBorder.style.cursor = 'pointer';
+    boxBorder.append(checkBorder);
+
+    checkText = document.createElement('div');
+    checkText.style.color =  '#ccc';
+    checkText.style.fontFamily = 'Arial,sans-serif';
+    checkText.style.fontSize = '16px';
+    checkText.style.lineHeight = '38px';
+    checkText.style.paddingLeft = '16px';
+    checkText.style.paddingRight = '15px';
+    checkText.innerHTML = 'Sales:';
+    checkBorder.before(checkText);
+
+    var border = document.createElement('input');
+    border.className= 'switch';
+    border.type= 'checkbox';
+    checkBorder.append(border);
+
+    var slider = document.createElement('div');
+    slider.className= 'slider round';
+    checkBorder.append(slider);
+
+
+
+    map.controls[google.maps.ControlPosition.RIGHT].push(CheckContainer3);
+
+
+
+
+}
+
+
 
 /**
  * Creates a custom map button that allows the user to delete their own
@@ -262,6 +468,7 @@ function initDeleteButton() {
         return deleteMessage();
     });
 }
+
 
 /**
  * Load initial markers
@@ -342,6 +549,37 @@ function initDeleteButton() {
  	});
  }
 
+
+function filterCows(){
+    if(!filterMode) {
+        enableFilter();
+    } else {
+        disableFilter();
+    }
+}
+
+function enableFilter(){
+    filterText.innerHTML = "All Cows";
+    filterMode=true;
+    deleteContainer.className = "options inactive";
+    cowBtnContainer.className = "options inactive";
+    
+    CheckContainer.className = "options ";
+    CheckContainer2.className = "options ";
+    CheckContainer3.className = "options ";
+
+}
+
+function disableFilter(){
+    filterText.innerHTML = "Filter Cows";
+    filterMode=false;
+    deleteContainer.className = "options";
+    cowBtnContainer.className = "options";
+   
+    CheckContainer.className = "options inactive";
+    CheckContainer2.className = "options inactive";
+    CheckContainer3.className = "options inactive";
+}
 /**
  * Modifies the text of the message drop button, as well as the guide text.
  */
@@ -372,6 +610,7 @@ function enableDrop() {
 
     // Remove the add comment and delete pin functionality if drop mode is true.
     deleteContainer.className = "options inactive";
+    filterContainer.className = "options inactive";
 }
 
 /**
@@ -387,6 +626,8 @@ function disableDrop() {
 
     // Add the add comment and delete pin functionality if drop mode is false.
     deleteContainer.className = "options";
+    filterContainer.className = "options";
+
 }
 
 /**
