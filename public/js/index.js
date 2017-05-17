@@ -199,8 +199,8 @@ function initModalListeners() {
  */
 function initMapButtons() {
     initDropButton();
-    initDeleteButton();
     initFilterBox();
+    initDeleteButton();
     initCheckbox1();
     initCheckbox2();
     initCheckbox3();
@@ -208,6 +208,7 @@ function initMapButtons() {
     CheckContainer.className = "options inactive";
     CheckContainer2.className = "options inactive";
     CheckContainer3.className = "options inactive";
+
     
 }
 
@@ -218,28 +219,31 @@ function initMapButtons() {
 function initDropButton() {
     // Create a div that holds the cow-dropping button.
     cowBtnContainer = document.createElement('div');
+    cowBtnContainer.style.paddingTop = '5px';
 
     // Set the CSS for the button's border.
-    var cowBtnBorder = document.createElement('div');
-    cowBtnBorder.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
-    cowBtnBorder.style.cursor = 'pointer';
-    cowBtnBorder.style.textAlign = 'center';
-    cowBtnBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
-    cowBtnContainer.appendChild(cowBtnBorder);
+    //var cowBtnBorder = document.createElement('div');
+    //cowBtnBorder.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
+    //cowBtnBorder.style.cursor = 'pointer';
+    //cowBtnBorder.style.textAlign = 'center';
+    //cowBtnBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    //cowBtnContainer.appendChild(cowBtnBorder);
 
     // Set the CSS for the button's interior content.
     cowBtnText = document.createElement('div');
-    cowBtnText.style.color = '#fff';
-    cowBtnText.style.fontFamily = 'Arial,sans-serif';
+    //cowBtnText.style.color = '#fff';
+    //cowBtnText.style.fontFamily = 'Arial,sans-serif';
+    cowBtnText.style.cursor = 'pointer';
     cowBtnText.style.fontSize = '16px';
     cowBtnText.style.lineHeight = '38px';
     cowBtnText.style.paddingLeft = '10px';
     cowBtnText.style.paddingRight = '10px';
     cowBtnText.innerHTML = 'Drop a Cow!';
-    cowBtnBorder.append(cowBtnText);
+    cowBtnText.className = 'button';
+    cowBtnContainer.append(cowBtnText);
 
     // Inserts the finished button to the right-center area of the map.
-    map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(cowBtnContainer);
+    map.controls[google.maps.ControlPosition.LEFT].push(cowBtnContainer);
 
     // Setup the map listener for the button.
     google.maps.event.addDomListener(cowBtnContainer, 'click', function() {
@@ -250,37 +254,41 @@ function initDropButton() {
 function initFilterBox() {
     
     filterContainer = document.createElement('div');
-    //filterContainer.style.padding = "10px 0px 0px 0px";
+    filterContainer.style.paddingTop = '5px';
+
 
     
    
 
-
-    var filterBorder = document.createElement('div');
-    filterBorder.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
-    filterBorder.style.cursor = 'pointer';
+    
+    //var filterBorder = document.createElement('div');
+    //filterBorder.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
+    //filterBorder.style.cursor = 'pointer';
     //filterBorder.style.textAlign = 'center';
-    filterBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
-    filterContainer.appendChild(filterBorder);
+    //filterBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    //filterBorder.className = "button";
+    //filterContainer.appendChild(filterBorder);
 
 
 
 
 
     filterText = document.createElement('div');
-    filterText.style.color = '#fff';
-    filterText.style.fontFamily = 'Arial,sans-serif';
+    //filterText.style.color = '#fff';
+    //filterText.style.fontFamily = 'Arial,sans-serif';
+    filterText.style.cursor = 'pointer';
     filterText.style.fontSize = '16px';
     filterText.style.lineHeight = '38px';
-    filterText.style.paddingLeft = '15px';
-    filterText.style.paddingRight = '15px';
+    filterText.style.paddingLeft = '14px';
+    filterText.style.paddingRight = '14px';
     filterText.innerHTML = 'Filter Cows';
-    filterBorder.append(filterText);
+    filterText.className = "button";
+    filterContainer.append(filterText);
 
     
 
     
-    map.controls[google.maps.ControlPosition.RIGHT].push(filterContainer);
+    map.controls[google.maps.ControlPosition.LEFT].push(filterContainer);
 
     google.maps.event.addDomListener(filterContainer, 'click', function() {
         return filterCows();
@@ -292,13 +300,13 @@ function initFilterBox() {
 function initCheckbox1(){
 
     CheckContainer = document.createElement('div');
-    CheckContainer.style.padding = "0px 16px 0px 10px";
+    CheckContainer.style.padding = "10px 16px 0px 13px";
 
     var boxBorder = document.createElement('div');
     boxBorder.style.backgroundColor = 'white';
     boxBorder.style.cursor = 'pointer';
     boxBorder.style.textAlign = 'center';
-    //boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
     CheckContainer.appendChild(boxBorder);
     
 
@@ -310,12 +318,12 @@ function initCheckbox1(){
     boxBorder.append(checkBorder);
 
     checkText = document.createElement('div');
-    checkText.style.color =  '#ccc';
+    checkText.style.color =  'rgba(43,132,237,1.0)';
     checkText.style.fontFamily = 'Arial,sans-serif';
     checkText.style.fontSize = '16px';
     checkText.style.lineHeight = '38px';
-    checkText.style.paddingLeft = '17px';
-    checkText.style.paddingRight = '17px';
+    checkText.style.paddingLeft = '14px';
+    checkText.style.paddingRight = '20px';
     checkText.innerHTML = 'Food:';
     checkBorder.before(checkText);
 
@@ -336,7 +344,7 @@ function initCheckbox1(){
 
 
 
-    map.controls[google.maps.ControlPosition.RIGHT].push(CheckContainer);
+    map.controls[google.maps.ControlPosition.LEFT].push(CheckContainer);
 
 
 
@@ -347,13 +355,13 @@ function initCheckbox1(){
 function initCheckbox2(){
 
     CheckContainer2 = document.createElement('div');
-    CheckContainer2.style.padding = "0px 16px 0px 10px";
+    CheckContainer2.style.padding = "0px 16px 0px 13px";
 
     var boxBorder = document.createElement('div');
     boxBorder.style.backgroundColor = 'white';
     boxBorder.style.cursor = 'pointer';
     boxBorder.style.textAlign = 'center';
-    //boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
     CheckContainer2.appendChild(boxBorder);
     
 
@@ -365,12 +373,12 @@ function initCheckbox2(){
     boxBorder.append(checkBorder);
 
     checkText = document.createElement('div');
-    checkText.style.color =  '#ccc';
+    checkText.style.color =  'rgba(43,132,237,1.0)';
     checkText.style.fontFamily = 'Arial,sans-serif';
     checkText.style.fontSize = '16px';
     checkText.style.lineHeight = '38px';
-    checkText.style.paddingLeft = '15px';
-    checkText.style.paddingRight = '15px';
+    checkText.style.paddingLeft = '12px';
+    checkText.style.paddingRight = '18px';
     checkText.innerHTML = 'Event:';
     checkBorder.before(checkText);
 
@@ -386,7 +394,7 @@ function initCheckbox2(){
 
 
 
-    map.controls[google.maps.ControlPosition.RIGHT].push(CheckContainer2);
+    map.controls[google.maps.ControlPosition.LEFT].push(CheckContainer2);
 
 
 
@@ -396,13 +404,13 @@ function initCheckbox2(){
 function initCheckbox3(){
 
     CheckContainer3 = document.createElement('div');
-    CheckContainer3.style.padding = "0px 16px 0px 10px";
+    CheckContainer3.style.padding = "0px 16px 0px 13px";
 
     var boxBorder = document.createElement('div');
     boxBorder.style.backgroundColor = 'white';
     boxBorder.style.cursor = 'pointer';
     boxBorder.style.textAlign = 'center';
-    //boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    boxBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
     CheckContainer3.appendChild(boxBorder);
     
 
@@ -414,12 +422,12 @@ function initCheckbox3(){
     boxBorder.append(checkBorder);
 
     checkText = document.createElement('div');
-    checkText.style.color =  '#ccc';
+    checkText.style.color =  'rgba(43,132,237,1.0)';
     checkText.style.fontFamily = 'Arial,sans-serif';
     checkText.style.fontSize = '16px';
     checkText.style.lineHeight = '38px';
-    checkText.style.paddingLeft = '16px';
-    checkText.style.paddingRight = '15px';
+    checkText.style.paddingLeft = '13px';
+    checkText.style.paddingRight = '18px';
     checkText.innerHTML = 'Sales:';
     checkBorder.before(checkText);
 
@@ -434,7 +442,7 @@ function initCheckbox3(){
 
 
 
-    map.controls[google.maps.ControlPosition.RIGHT].push(CheckContainer3);
+    map.controls[google.maps.ControlPosition.LEFT].push(CheckContainer3);
 
 
 
@@ -451,28 +459,32 @@ function initCheckbox3(){
 function initDeleteButton() {
     // Create a div that holds the delete message button.
     deleteContainer = document.createElement('div');
-    deleteContainer.style.padding = "10px 25px 0px 0px";
-    deleteContainer.className = "options";
+    deleteContainer.style.padding = "30px 0px 0px 10px";
+    //deleteContainer.className = "options";
 
     // Set the CSS for the button's border.
-    var deleteBorder = document.createElement('div');
-    deleteBorder.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
-    deleteBorder.style.cursor = 'pointer';
-    deleteBorder.style.textAlign = 'center';
-    deleteBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
-    deleteBorder.style.borderRadius = '45%';
-    deleteContainer.appendChild(deleteBorder);
+    //var deleteBorder = document.createElement('div');
+    //deleteBorder.style.backgroundColor = 'rgba(43, 132, 237, 1.0)';
+    //deleteBorder.style.cursor = 'pointer';
+    //deleteBorder.style.textAlign = 'center';
+    //deleteBorder.style.boxShadow = '-8px 5px 6px rgba(0, 0, 0, 0.3)';
+    //deleteBorder.className = "button";
+    //deleteBorder.style.borderRadius = '45%';
+    //deleteContainer.appendChild(deleteBorder);
 
     // Set the CSS for the button's interior content.
     var deleteImg = document.createElement('img');
+    deleteImg.style.cursor = 'pointer';
     deleteImg.setAttribute('src', 'img/trash.png');
     deleteImg.style.height = '65px';
     deleteImg.style.width = '53px';
-    deleteImg.style.padding = "10px 10px 10px 10px"
-    deleteBorder.appendChild(deleteImg);
+    deleteImg.style.padding = "10px 10px 10px 10px";
+    deleteImg.className = "button delete";
+    deleteImg.style.boxShadow = '-8px 5px 5px rgba(0, 0, 0, 0.3)';
+    deleteContainer.appendChild(deleteImg);
 
     // Inserts the finished button to the right-bottom area of the map.
-    map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(deleteContainer);
+    map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(deleteContainer);
 
     // Setup the map listener for the button.
     google.maps.event.addDomListener(deleteContainer, 'click', function() {
@@ -570,7 +582,7 @@ function filterCows(){
 }
 
 function enableFilter(){
-    filterText.innerHTML = "All Cows";
+    filterText.innerHTML = "Exit Filter";
     filterMode=true;
     deleteContainer.className = "options inactive";
     cowBtnContainer.className = "options inactive";
