@@ -15,6 +15,7 @@ var CheckContainer;
 var CheckContainer2;
 var CheckContainer3;
 
+
 var currInfo;
 var currPreview;
 
@@ -318,10 +319,14 @@ function initCheckbox1(){
     checkText.innerHTML = 'Food:';
     checkBorder.before(checkText);
 
-    var border = document.createElement('input');
-    border.className= 'switch';
-    border.type= 'checkbox';
-    checkBorder.append(border);
+    var border1 = document.createElement('input');
+    border1.id = 'clicked1';
+    border1.className= 'switch';
+    border1.type= 'checkbox';
+    checkBorder.append(border1);
+
+   
+   
 
     var slider = document.createElement('div');
     slider.className= 'slider round';
@@ -337,6 +342,7 @@ function initCheckbox1(){
 
 
 }
+ 
 
 function initCheckbox2(){
 
@@ -435,6 +441,7 @@ function initCheckbox3(){
 
 }
 
+ 
 
 
 /**
@@ -444,7 +451,7 @@ function initCheckbox3(){
 function initDeleteButton() {
     // Create a div that holds the delete message button.
     deleteContainer = document.createElement('div');
-    deleteContainer.style.padding = "10px 10px 0px 0px";
+    deleteContainer.style.padding = "10px 25px 0px 0px";
     deleteContainer.className = "options";
 
     // Set the CSS for the button's border.
@@ -453,11 +460,15 @@ function initDeleteButton() {
     deleteBorder.style.cursor = 'pointer';
     deleteBorder.style.textAlign = 'center';
     deleteBorder.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    deleteBorder.style.borderRadius = '45%';
     deleteContainer.appendChild(deleteBorder);
 
     // Set the CSS for the button's interior content.
     var deleteImg = document.createElement('img');
-    deleteImg.setAttribute('src', 'img/delete.png');
+    deleteImg.setAttribute('src', 'img/trash.png');
+    deleteImg.style.height = '65px';
+    deleteImg.style.width = '53px';
+    deleteImg.style.padding = "10px 10px 10px 10px"
     deleteBorder.appendChild(deleteImg);
 
     // Inserts the finished button to the right-bottom area of the map.
@@ -567,6 +578,9 @@ function enableFilter(){
     CheckContainer.className = "options ";
     CheckContainer2.className = "options ";
     CheckContainer3.className = "options ";
+    console.log("ugh");
+
+   
 
 }
 
@@ -580,6 +594,12 @@ function disableFilter(){
     CheckContainer2.className = "options inactive";
     CheckContainer3.className = "options inactive";
 }
+
+if(document.getElementById('clicked1').checked){
+         console.log("ugh");
+    }
+
+
 /**
  * Modifies the text of the message drop button, as well as the guide text.
  */
